@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Gerenciar Presentes ⚙️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
+    .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #d4af37; }
+    
+    /* Estilo do Formulário */
+    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+    label { font-weight: 600; margin-bottom: 5px; }
+    input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+    button#btn-adicionar { background: #27ae60; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+    
+    /* Lista de Itens */
+    .lista-admin { margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px; }
+    .item-admin { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+    .item-admin img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 15px; }
+    .btn-excluir { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+    .info-item { flex-grow: 1; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Gerenciar Presentes 🎁</h1>
+
+  <div class="form-group">
+    <label>Nome do Presente:</label>
+    <input type="text" id="nome" placeholder="Ex: Jogo de Panelas">
+  </div>
+  <div class="form-group">
+    <label>Link da Imagem:</label>
+    <input type="text" id="imagem" placeholder="https://link-da-foto.jpg">
+  </div>
+  <div class="form-group">
+    <label>Quantidade Total (Cotas):</label>
+    <input type="number" id="total" value="1" min="1">
+  </div>
+  <button id="btn-adicionar" onclick="adicionarPresente()">Adicionar à Lista</button>
+
+  <div class="lista-admin">
+    <h2>Itens Atuais</h2>
+    <div id="lista-itens-admin">Carregando...</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+  // Use a MESMA configuração do seu outro arquivo
+  var firebaseConfig = {
+    apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
+    authDomain: "lista-casamento-f19c4.firebaseapp.com",
+    projectId: "lista-casamento-f19c4"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  // Função para Adicionar
+  function adicionarPresente() {
+    var nome = document.getElementById("nome").value;
+    var imagem = document.getElementById("imagem").value;
+    var total = parseInt(document.getElementById("total").value);
+
+    if (nome === "" || imagem === "") {
+      alert("Preencha o nome e o link da imagem!");
+      return;
+    }
+
+    db.collection("presentes").add({
+      nome: nome,
+      imagem: imagem,
+      total: total,
+      recebidos: 0 // Começa sempre com zero
+    }).then(function() {
+      alert("Presente adicionado com sucesso!");
+      document.getElementById("nome").value = "";
+      document.getElementById("imagem").value = "";
+      document.getElementById("total").value = "1";
+    });
+  }
+
+  // Listar itens para poder excluir
+  db.collection("presentes").onSnapshot(function(snapshot) {
+    var listaDiv = document.getElementById("lista-itens-admin");
+    listaDiv.innerHTML = "";
+
+    snapshot.forEach(function(doc) {
+      var p = doc.data();
+      var id = doc.id;
+
+      var item = document.createElement("div");
+      item.className = "item-admin";
+      item.innerHTML = 
+        '<img src="' + p.imagem + '">' +
+        '<div class="info-item">' +
+          '<strong>' + p.nome + '</strong><br>' +
+          'Qtd: ' + p.total + ' | Recebidos: ' + p.recebidos +
+        '</div>' +
+        '<button class="btn-excluir" onclick="excluirItem(\'' + id + '\')">Excluir</button>';
+      
+      listaDiv.appendChild(item);
+    });
+  });
+
+  // Função para Excluir
+  function excluirItem(id) {
+    if (confirm("Tem certeza que deseja apagar este item da lista?")) {
+      db.collection("presentes").doc(id).delete().then(function() {
+        alert("Item removido!");
+      });
+    }
+  }
+</script>
+
+</body>
+</html>
