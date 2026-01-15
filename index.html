@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lista de Casamento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <h1>Lista de Casamento 💍</h1>
+
+  <p>Escolha um presente disponível:</p>
+
+  <ul id="lista-presentes">
+    <li>Carregando presentes...</li>
+  </ul>
+
+  <script>
+    const presentes = [
+      { nome: "Air Fryer", escolhido: false },
+      { nome: "Jogo de Panelas", escolhido: true },
+      { nome: "Liquidificador", escolhido: false }
+    ];
+
+    const lista = document.getElementById("lista-presentes");
+    lista.innerHTML = "";
+
+    presentes.forEach(presente => {
+      const li = document.createElement("li");
+
+      if (presente.escolhido) {
+        li.textContent = ${presente.nome} — ❌ Já escolhido;
+      } else {
+        const btn = document.createElement("button");
+        btn.textContent = Escolher ${presente.nome};
+        btn.onclick = () => {
+          alert(Você escolheu: ${presente.nome});
+        };
+
+        li.appendChild(btn);
+      }
+
+      lista.appendChild(li);
+    });
+  </script>
+
+</body>
+</html>
