@@ -8,33 +8,50 @@
   <style>
     :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-fundo: #f8f9fa; }
     body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 10px; color: #333; }
-    h1 { text-align: center; color: var(--cor-principal); margin-bottom: 10px; }
-    p.subtitulo { text-align: center; margin-bottom: 30px; color: #666; }
+    h1 { text-align: center; color: var(--cor-principal); margin-bottom: 5px; font-size: 1.8rem; }
+    p.subtitulo { text-align: center; margin-bottom: 25px; color: #666; font-size: 0.9rem; }
     
+    /* Container Base */
     .grid-presentes {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      max-width: 1000px;
+      gap: 15px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
+    /* --- RESPONSIVIDADE (AS COLUNAS) --- */
+    
+    /* Celular (Até 600px): 2 itens por linha */
+    @media (max-width: 600px) {
+      .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      h3 { font-size: 0.85rem !important; }
+      .status-text { font-size: 0.7rem !important; }
+      .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
+    }
+
+    /* Tablet (601px até 1024px): 3 ou 4 itens por linha */
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .grid-presentes { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Computador (Acima de 1025px): 6 itens por linha */
+    @media (min-width: 1025px) {
+      .grid-presentes { grid-template-columns: repeat(6, 1fr); }
+    }
+
+    /* --- ESTILO DOS CARDS --- */
     .card {
       background: white;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      transition: transform 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       display: flex;
       flex-direction: column;
     }
 
-    .card:hover { transform: translateY(-3px); }
-
-    /* 1. Imagem Quadrada */
     .card-img-container {
       width: 100%;
-      padding-top: 100%; /* Cria um quadrado perfeito (aspect-ratio 1:1) */
+      padding-top: 100%; /* Mantém a imagem quadrada */
       position: relative;
       background: #f4f4f4;
     }
@@ -43,32 +60,30 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      object-fit: cover; /* Preenche o quadrado sem distorcer */
-      object-position: center;
+      object-fit: cover;
     }
     
-    /* 3. Espaçamento Reduzido */
-    .card-info { padding: 15px; display: flex; flex-direction: column; gap: 8px; text-align: center; }
+    /* Espaçamento Compacto */
+    .card-info { padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; text-align: center; }
     
-    h3 { margin: 0; font-size: 1.1rem; font-weight: 600; color: #444; }
+    h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
     
-    /* Estilo do Texto de Status */
-    .status-text { font-size: 0.85rem; color: #777; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 2px; }
+    .status-text { font-size: 0.8rem; color: #777; margin-bottom: 2px; }
     
-    /* 2. Barra de Progresso Verde */
+    /* Barra de Progresso Verde */
     .progress-bar-bg {
       background: #eee;
-      height: 8px;
-      border-radius: 4px;
+      height: 6px;
+      border-radius: 3px;
       overflow: hidden;
-      width: 80%; /* Barra não ocupa 100% da largura */
-      margin: 0 auto 5px auto; /* Centraliza e dá espaço inferior */
+      width: 90%;
+      margin: 0 auto;
     }
     
     .progress-bar-fill {
       height: 100%;
       background: var(--cor-verde);
-      transition: width 0.5s ease-in-out;
+      transition: width 0.5s ease;
     }
 
     .btn-presentear {
@@ -77,27 +92,24 @@
       border: none;
       padding: 10px;
       width: 100%;
-      border-radius: 25px;
+      border-radius: 20px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
-      transition: background 0.2s;
+      font-size: 0.9rem;
+      margin-top: 5px;
     }
 
-    .btn-presentear:hover:not(:disabled) { background: #b8962d; }
     .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
-    .card.esgotado { opacity: 0.7; }
-    .card.esgotado img { filter: grayscale(0.8); }
+    .card.esgotado { opacity: 0.7; filter: grayscale(0.5); }
   </style>
 </head>
 <body>
 
   <h1>Nossa Lista de Casamento 💍</h1>
-  <p class="subtitulo">Escolha com carinho um presente para nós!</p>
+  <p class="subtitulo">Toque no item para nos presentear</p>
 
   <div class="grid-presentes" id="lista">
-    <p style="text-align: center; grid-column: 1/-1;">Carregando lista...</p>
-  </div>
+    </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -114,63 +126,39 @@
     var listaDiv = document.getElementById("lista");
 
     db.collection("presentes").onSnapshot(function(snapshot) {
-      if (snapshot.empty) {
-        listaDiv.innerHTML = "<p>A lista está vazia no momento.</p>";
-        return;
-      }
-
       listaDiv.innerHTML = "";
-
       snapshot.forEach(function(doc) {
         var p = doc.data();
         var id = doc.id;
-
         var total = p.total || 1;
         var recebidos = p.recebidos || 0;
-        var nome = p.nome || "Presente";
-        var imagem = p.imagem || "https://via.placeholder.com/300?text=Sem+Foto";
         var esgotado = recebidos >= total;
-
-        // Cálculo da porcentagem para a barra
         var porcentagem = Math.min((recebidos / total) * 100, 100);
 
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
 
-        var btnTexto = esgotado ? "Esgotado" : "Escolher este";
-        var btnDisabled = esgotado ? "disabled" : "";
-
-        // HTML montado com a nova estrutura
+        // Montagem usando concatenação simples para evitar erros de caractere
         card.innerHTML = 
-          '<div class="card-img-container">' +
-            '<img src="' + imagem + '" alt="' + nome + '">' +
-          '</div>' +
+          '<div class="card-img-container"><img src="' + p.imagem + '"></div>' +
           '<div class="card-info">' +
-            '<div class="status-text">🎁 Recebidos: ' + recebidos + ' de ' + total + '</div>' +
-            // Barra de Progresso
-            '<div class="progress-bar-bg">' +
-              '<div class="progress-bar-fill" style="width: ' + porcentagem + '%"></div>' +
-            '</div>' +
-            '<h3>' + nome + '</h3>' +
-            '<button class="btn-presentear" ' + btnDisabled + ' onclick="confirmar(\'' + id + '\')">' +
-              btnTexto +
+            '<div class="status-text">Recebidos: ' + recebidos + ' de ' + total + '</div>' +
+            '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ' + porcentagem + '%"></div></div>' +
+            '<h3>' + p.nome + '</h3>' +
+            '<button class="btn-presentear" ' + (esgotado ? "disabled" : "") + ' onclick="confirmar(\'' + id + '\')">' +
+              (esgotado ? "Esgotado" : "Escolher") +
             '</button>' +
           '</div>';
 
         listaDiv.appendChild(card);
       });
-    }, function(error) {
-      console.error("Erro:", error);
-      listaDiv.innerHTML = "<p style='color:red; text-align:center'>Erro ao carregar a lista.</p>";
     });
 
     function confirmar(id) {
-      if(confirm("Confirmar a escolha deste presente?")) {
+      if(confirm("Deseja confirmar este presente?")) {
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
-        }).then(function() {
-          alert("Obrigado! Sua escolha foi registrada. ❤️");
-        });
+        }).then(function() { alert("Muito obrigado! ❤️"); });
       }
     }
   </script>
