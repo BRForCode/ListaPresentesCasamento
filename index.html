@@ -3,63 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <title>Lista de Casamento</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
 
-  <h1>Lista de Casamento 💍</h1>
-  <p>Escolha um presente disponível:</p>
+<h1>Lista de Casamento 💍</h1>
 
-  <ul id="lista-presentes">
-    <li>Carregando presentes...</li>
-  </ul>
+<ul id="lista-presentes">
+  <li>Carregando presentes...</li>
+</ul>
 
-  <!-- FIREBASE (CARREGA PRIMEIRO) -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<!-- Firebase compat (SEM module) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
-      authDomain: "lista-casamento-f19c4.firebaseapp.com",
-      projectId: "lista-casamento-f19c4",
-      storageBucket: "lista-casamento-f19c4.firebasestorage.app",
-      messagingSenderId: "704126420674",
-      appId: "1:704126420674:web:16b47c759235870ace1d5b"
-    };
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
+    authDomain: "lista-casamento-f19c4.firebaseapp.com",
+    projectId: "lista-casamento-f19c4",
+  });
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  const db = firebase.firestore();
+</script>
 
-    console.log("🔥 Firebase conectado!");
-  </script>
+<script>
+  const lista = document.getElementById("lista-presentes");
 
-  <!-- SCRIPT DA LISTA (DEPOIS DO FIREBASE) -->
-  <script>
-    const lista = document.getElementById("lista-presentes");
+  db.collection("presentes").onSnapshot(snapshot => {
+    console.log("Snapshot recebido:", snapshot.size);
 
-    db.collection("presentes").onSnapshot(snapshot => {
-      lista.innerHTML = "";
+    lista.innerHTML = "";
 
-      snapshot.forEach(doc => {
-        const presente = doc.data();
-        const li = document.createElement("li");
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      const li = document.createElement("li");
 
-        if (presente.escolhido) {
-          li.textContent = ${presente.nome} — ❌ Já escolhido;
-        } else {
-          const btn = document.createElement("button");
-          btn.textContent = Escolher ${presente.nome};
-          btn.onclick = () => {
-            alert(Você escolheu: ${presente.nome});
-          };
-          li.appendChild(btn);
-        }
+      li.textContent = p.escolhido
+        ? ${p.nome} — ❌ Já escolhido
+        : p.nome;
 
-        lista.appendChild(li);
-      });
+      lista.appendChild(li);
     });
-  </script>
+  });
+</script>
 
 </body>
 </html>
