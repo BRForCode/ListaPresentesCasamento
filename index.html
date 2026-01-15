@@ -8,58 +8,75 @@
   <style>
     :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-fundo: #f8f9fa; }
     
+    /* Animações */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes floatHeart { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5); opacity: 0; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 10px; color: #333; overflow-x: hidden; }
     
     /* --- CABEÇALHO --- */
     header { text-align: center; margin-bottom: 30px; }
-    
-    .titulo-lista { font-size: 1.4rem; color: var(--cor-principal); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    
-    /* Faz os nomes ficarem na mesma linha no celular */
+    .titulo-lista { font-size: 1.2rem; color: var(--cor-principal); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .nomes-casal { 
       font-size: 1.8rem; 
       color: var(--cor-principal); 
       margin: 5px 0; 
       font-weight: 700;
-      white-space: nowrap; /* Impede a quebra de linha */
+      white-space: nowrap; /* Patricia e Luiz Henrique na mesma linha */
       display: block;
     }
-
-    .subtitulo { margin: 10px auto; color: #666; font-size: 0.9rem; max-width: 320px; line-height: 1.4; }
+    .subtitulo { margin: 10px auto; color: #666; font-size: 0.9rem; max-width: 350px; line-height: 1.4; }
     
-    /* --- GRID --- */
+    /* --- GRID RESPONSIVA --- */
     .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; }
 
+    /* Celular: 2 colunas */
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .nomes-casal { font-size: 1.3rem; } /* Diminui a fonte no celular para caber em uma linha */
-      .titulo-lista { font-size: 1rem; }
+      .nomes-casal { font-size: 1.3rem; }
       h3 { font-size: 0.85rem !important; }
       .status-text { font-size: 0.7rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
+    /* Tablet */
     @media (min-width: 601px) and (max-width: 1024px) { .grid-presentes { grid-template-columns: repeat(3, 1fr); } }
+    /* Computador: 6 colunas */
     @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
     /* --- CARDS --- */
     .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); animation: fadeInUp 0.6s ease backwards; }
-    .card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.12); }
+    .card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+    /* Imagem Quadrada */
     .card-img-container { width: 100%; padding-top: 100%; position: relative; background: #f4f4f4; overflow: hidden; }
     .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
     .card:hover img { transform: scale(1.1); }
     
-    .card-info { padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; text-align: center; }
-    h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
-    .status-text { font-size: 0.8rem; color: #777; margin-bottom: 2px; }
+    /* Informações e Proximidade */
+    .card-info { padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; text-align: center; }
+    h3 { margin: 0; font-size: 0.95rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
+    .status-text { font-size: 0.75rem; color: #777; }
     
-    .progress-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; width: 90%; margin: 0 auto; }
-    .progress-bar-fill { height: 100%; background: var(--cor-verde); transition: width 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+    /* Barra de Progresso Verde */
+    .progress-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; width: 90%; margin: 2px auto; }
+    .progress-bar-fill { height: 100%; background: var(--cor-verde); transition: width 1s ease; }
 
     .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-top: 5px; transition: background 0.3s; }
     .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
+    
+    /* --- MURAL CARROSSEL --- */
+    .mural-container { max-width: 800px; margin: 60px auto 20px auto; text-align: center; padding: 20px; }
+    .carousel { position: relative; overflow: hidden; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 40px; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+    .message-item { display: none; animation: fadeIn 0.8s; }
+    .message-item.active { display: block; }
+    .message-text { font-style: italic; font-size: 1.1rem; color: #555; margin-bottom: 10px; }
+    .message-author { font-weight: 600; color: var(--cor-principal); font-size: 0.9rem; }
+
+    /* --- RODAPÉ --- */
+    footer { padding: 40px 20px; background: white; text-align: center; border-top: 1px solid #eee; }
+    .footer-info { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-bottom: 20px; }
+    .footer-info div p { margin: 5px 0; color: #666; font-size: 0.9rem; }
     
     .heart-animation { position: fixed; font-size: 2rem; color: #e74c3c; pointer-events: none; z-index: 10000; animation: floatHeart 2.5s linear forwards; }
   </style>
@@ -74,6 +91,27 @@
 
   <div class="grid-presentes" id="lista"></div>
 
+  <div class="mural-container">
+    <h2 style="color: var(--cor-principal); font-size: 1.4rem; margin-bottom: 20px;">Mural de Carinho ❤️</h2>
+    <div class="carousel" id="mural-mensagens">
+      <p>Aguardando mensagens carinhosas...</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-info">
+      <div>
+        <p><strong>Nosso Casamento</strong></p>
+        <p>Prepare o coração para este grande dia!</p>
+      </div>
+      <div>
+        <p><strong>Dúvidas?</strong></p>
+        <p>Fale conosco pelo WhatsApp</p>
+      </div>
+    </div>
+    <p style="font-size: 0.8rem; color: #aaa;">© 2026 Patricia & Luiz Henrique</p>
+  </footer>
+
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -86,9 +124,10 @@
 
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
-    var listaDiv = document.getElementById("lista");
 
+    // --- CARREGAR PRESENTES ---
     db.collection("presentes").onSnapshot(function(snapshot) {
+      var listaDiv = document.getElementById("lista");
       listaDiv.innerHTML = "";
       var delay = 0;
 
@@ -120,20 +159,62 @@
       });
     });
 
+    // --- CARREGAR MURAL ---
+    db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(function(snapshot) {
+      var container = document.getElementById("mural-mensagens");
+      if (snapshot.empty) return;
+      
+      var html = "";
+      var msgs = [];
+      snapshot.forEach(doc => msgs.push(doc.data()));
+      
+      msgs.forEach((m, index) => {
+        html += '<div class="message-item ' + (index === 0 ? 'active' : '') + '">' +
+                  '<p class="message-text">"' + m.texto + '"</p>' +
+                  '<p class="message-author">— ' + m.nome + '</p>' +
+                '</div>';
+      });
+      container.innerHTML = html;
+      iniciarCarrossel();
+    });
+
+    function iniciarCarrossel() {
+      var current = 0;
+      var items = document.querySelectorAll('.message-item');
+      if(items.length <= 1) return;
+      
+      setInterval(function() {
+        items[current].classList.remove('active');
+        current = (current + 1) % items.length;
+        items[current].classList.add('active');
+      }, 5000);
+    }
+
+    // --- CONFIRMAR ESCOLHA ---
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
-        chuvaDeCoracoes();
+        var nomeConvidado = prompt("Qual o seu nome?");
+        var msgConvidado = prompt("Deixe uma mensagem curta para os noivos:");
+
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
-        }).then(function() { 
-          setTimeout(() => { alert("Muito obrigado! ❤️"); }, 500);
+        }).then(function() {
+          if(nomeConvidado && msgConvidado) {
+            db.collection("mensagens").add({
+              nome: nomeConvidado,
+              texto: msgConvidado,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+          chuvaDeCoracoes();
+          setTimeout(() => { alert("Muito obrigado pelo carinho! ❤️"); }, 500);
         });
       }
     }
 
     function chuvaDeCoracoes() {
       for (let i = 0; i < 15; i++) {
-        const heart = document.createElement('div');
+        var heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.className = 'heart-animation';
         heart.style.left = Math.random() * 100 + 'vw';
