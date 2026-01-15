@@ -13,16 +13,14 @@
   <ul id="lista-presentes"></ul>
 
   <!-- SCRIPT DA LISTA (SIMULAÇÃO LOCAL) -->
-  <script>
-    const presentes = [
-      { nome: "Air Fryer", escolhido: false },
-      { nome: "Jogo de Panelas", escolhido: true },
-      { nome: "Liquidificador", escolhido: false }
-    ];
+<script>
+  const lista = document.getElementById("lista-presentes");
 
-    const lista = document.getElementById("lista-presentes");
+  firebase.firestore().collection("presentes").onSnapshot(snapshot => {
+    lista.innerHTML = "";
 
-    presentes.forEach(presente => {
+    snapshot.forEach(doc => {
+      const presente = doc.data();
       const li = document.createElement("li");
 
       if (presente.escolhido) {
@@ -38,7 +36,8 @@
 
       lista.appendChild(li);
     });
-  </script>
+  });
+</script>
 
   <!-- FIREBASE (VERSÃO COMPATÍVEL – ESTÁVEL) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
