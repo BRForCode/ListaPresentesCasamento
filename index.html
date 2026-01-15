@@ -6,126 +6,128 @@
   <title>Nossa Lista de Casamento 💍</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    :root { --cor-principal: #d4af37; --cor-fundo: #f4f4f4; --cor-texto: #333; }
-    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px; color: var(--cor-texto); }
-    header { text-align: center; padding: 30px 0; }
+    :root { --cor-principal: #d4af37; --cor-fundo: #f8f9fa; }
+    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px; text-align: center; }
     
     .grid-presentes {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
+      gap: 25px;
+      max-width: 1200px;
+      margin: 40px auto;
     }
 
     .card {
-      background: #fff;
-      border-radius: 12px;
+      background: white;
+      border-radius: 15px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
       transition: 0.3s;
     }
 
-    .card img { width: 100%; height: 200px; object-fit: cover; }
-    .info { padding: 15px; text-align: center; flex-grow: 1; }
+    .card img { width: 100%; height: 220px; object-fit: cover; background: #eee; }
+    .info { padding: 20px; }
     
-    /* Estilo do Contador/Status */
-    .contador {
-      background: #eee;
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 0.85rem;
+    .status {
       display: inline-block;
-      margin-bottom: 10px;
-      font-weight: 600;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+      background: #f0f0f0;
     }
 
     .btn-presentear {
       background: var(--cor-principal);
-      color: #fff;
+      color: white;
       border: none;
       padding: 12px;
       width: 100%;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      transition: 0.3s;
     }
 
     .btn-presentear:disabled { background: #ccc; cursor: not-allowed; }
-    .esgotado { filter: grayscale(1); opacity: 0.6; }
+    .esgotado { opacity: 0.6; filter: grayscale(1); }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Lista de Casamento 💍</h1>
-  <p>Escolha um presente para nos presentear!</p>
-</header>
+  <h1>Nossa Lista de Presentes 💍</h1>
+  <p>Toque no item que deseja nos presentear</p>
 
-<div class="grid-presentes" id="lista">
-  <p style="text-align: center; grid-column: 1/-1;">Carregando presentes...</p>
-</div>
+  <div class="grid-presentes" id="lista">
+    <p id="loading">Carregando presentes...</p>
+  </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<script>
-  firebase.initializeApp({
-    apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
-    authDomain: "lista-casamento-f19c4.firebaseapp.com",
-    projectId: "lista-casamento-f19c4"
-  });
+  <script>
+    // Sua configuração original
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
+      authDomain: "lista-casamento-f19c4.firebaseapp.com",
+      projectId: "lista-casamento-f19c4"
+    };
 
-  var db = firebase.firestore();
-  var listaDiv = document.getElementById("lista");
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const listaDiv = document.getElementById("lista");
 
-  db.collection("presentes").onSnapshot(function(snapshot) {
-    listaDiv.innerHTML = "";
+    // Lendo os dados
+    db.collection("presentes").onSnapshot((snapshot) => {
+      console.log("Dados recebidos do Firebase:", snapshot.size, "itens encontrados.");
+      
+      if (snapshot.empty) {
+        listaDiv.innerHTML = "<p>Nenhum presente encontrado no banco de dados.</p>";
+        return;
+      }
 
-    snapshot.forEach(function(doc) {
-      var p = doc.data();
-      var id = doc.id;
+      listaDiv.innerHTML = ""; // Limpa o carregando
 
-      // Lógica de quantidade: se não existir o campo 'total', assume que é 1 (item único)
-      var total = p.total || 1;
-      var recebidos = p.recebidos || 0;
-      var esgotado = recebidos >= total;
+      snapshot.forEach((doc) => {
+        const p = doc.data();
+        const id = doc.id;
 
-      var card = document.createElement("div");
-      card.className = "card" + (esgotado ? " esgotado" : "");
+        // Garante que os valores existam para não quebrar o código
+        const total = p.total || 1;
+        const recebidos = p.recebidos || 0;
+        const nome = p.nome || "Presente sem nome";
+        const imagem = p.imagem || "https://via.placeholder.com/300?text=Sem+Foto";
+        
+        const esgotado = recebidos >= total;
 
-      card.innerHTML = `
-        <img src="${p.imagem || 'https://via.placeholder.com/300'}" alt="${p.nome}">
-        <div class="info">
-          <h3>${p.nome}</h3>
-          <div class="contador">
-            ${esgotado ? "❌ Esgotado" : 🎁 Recebidos: ${recebidos} de ${total}}
+        const card = document.createElement("div");
+        card.className = card ${esgotado ? 'esgotado' : ''};
+        card.innerHTML = `
+          <img src="${imagem}" alt="${nome}">
+          <div class="info">
+            <span class="status">${esgotado ? "❌ Esgotado" : 🎁 Recebidos: ${recebidos} de ${total}}</span>
+            <h3>${nome}</h3>
+            <button class="btn-presentear" ${esgotado ? 'disabled' : ''} onclick="confirmar('${id}')">
+              ${esgotado ? 'Já escolhido' : 'Escolher este'}
+            </button>
           </div>
-          <button class="btn-presentear" 
-                  ${esgotado ? "disabled" : ""} 
-                  onclick="confirmarPresente('${id}', ${recebidos})">
-            ${esgotado ? "Já escolhido" : "Dar este presente"}
-          </button>
-        </div>
-      `;
-      listaDiv.appendChild(card);
-    });
-  });
-
-  function confirmarPresente(id, recebidosAtual) {
-    if (confirm("Você confirma que deseja dar este presente?")) {
-      // Incrementa o contador 'recebidos' no Firebase
-      db.collection("presentes").doc(id).update({
-        recebidos: firebase.firestore.FieldValue.increment(1)
-      }).then(() => {
-        alert("Muito obrigado! ❤️");
+        `;
+        listaDiv.appendChild(card);
       });
-    }
-  }
-</script>
+    }, (error) => {
+      console.error("Erro ao ler o Firebase:", error);
+      listaDiv.innerHTML = <p style="color:red">Erro de permissão ou conexão. Verifique as Regras do Firebase.</p>;
+    });
 
+    function confirmar(id) {
+      if(confirm("Deseja confirmar que dará este presente?")) {
+        db.collection("presentes").doc(id).update({
+          recebidos: firebase.firestore.FieldValue.increment(1)
+        }).then(() => alert("Muito obrigado! ❤️"));
+      }
+    }
+  </script>
 </body>
 </html>
