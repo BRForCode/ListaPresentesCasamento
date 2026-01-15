@@ -2,21 +2,128 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Lista de Casamento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nossa Lista de Casamento 💍</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cor-principal: #d4af37; /* Dourado */
+      --cor-fundo: #f9f9f9;
+      --cor-texto: #333;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--cor-fundo);
+      color: var(--cor-texto);
+      margin: 0;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    h1 {
+      font-weight: 300;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    /* Container Responsivo */
+    .container-presentes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Estilo do Card */
+    .card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-info {
+      padding: 20px;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    .card-info h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.2rem;
+    }
+
+    /* Status e Botão */
+    .status {
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .disponivel { color: #27ae60; }
+    .escolhido { 
+      color: #e74c3c; 
+      filter: grayscale(1);
+      opacity: 0.7;
+    }
+
+    .btn-presentear {
+      background-color: var(--cor-principal);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+      transition: background 0.3s;
+    }
+
+    .btn-presentear:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn-presentear:hover:not(:disabled) {
+      background-color: #b8962d;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Lista de Casamento 💍</h1>
+<header>
+  <h1>Lista de Casamento 💍</h1>
+  <p>Escolha um presente para nos ajudar a montar nosso novo lar!</p>
+</header>
 
-<ul id="lista-presentes">
-  <li>Carregando presentes...</li>
-</ul>
+<div class="container-presentes" id="grid-presentes">
+  <p style="text-align: center; grid-column: 1/-1;">Carregando presentes...</p>
+</div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
+  // Sua configuração (mantenha a mesma)
   firebase.initializeApp({
     apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
     authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -24,27 +131,51 @@
   });
 
   var db = firebase.firestore();
-</script>
+  var grid = document.getElementById("grid-presentes");
 
-<script>
-  var lista = document.getElementById("lista-presentes");
-
+  // Escutar atualizações do Firestore
   db.collection("presentes").onSnapshot(function(snapshot) {
-    lista.innerHTML = "";
+    grid.innerHTML = "";
 
     snapshot.forEach(function(doc) {
       var p = doc.data();
-      var li = document.createElement("li");
+      var id = doc.id;
 
-      if (p.escolhido === true) {
-        li.textContent = p.nome + " — ❌ Já escolhido";
-      } else {
-        li.textContent = p.nome;
-      }
+      // Criar o Card
+      var card = document.createElement("div");
+      card.className = "card" + (p.escolhido ? " escolhido" : "");
 
-      lista.appendChild(li);
+      card.innerHTML = `
+        <img src="${p.imagem || 'https://via.placeholder.com/300'}" alt="${p.nome}">
+        <div class="card-info">
+          <h3>${p.nome}</h3>
+          <span class="status ${p.escolhido ? 'escolhido' : 'disponivel'}">
+            ${p.escolhido ? '❌ Já escolhido' : '✅ Disponível'}
+          </span>
+          <button class="btn-presentear" 
+                  ${p.escolhido ? 'disabled' : ''} 
+                  onclick="escolherPresente('${id}')">
+            ${p.escolhido ? 'Indisponível' : 'Presentear'}
+          </button>
+        </div>
+      `;
+
+      grid.appendChild(card);
     });
   });
+
+  // Função para marcar como escolhido
+  function escolherPresente(id) {
+    if(confirm("Deseja realmente escolher este presente?")) {
+      db.collection("presentes").doc(id).update({
+        escolhido: true
+      }).then(() => {
+        alert("Obrigado! Você escolheu o presente.");
+      }).catch((error) => {
+        console.error("Erro ao atualizar: ", error);
+      });
+    }
+  }
 </script>
 
 </body>
