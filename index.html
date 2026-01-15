@@ -7,11 +7,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-fundo: #f8f9fa; }
-    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 10px; color: #333; }
+    
+    /* Animação de Entrada */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Animação do Coração Flutuante */
+    @keyframes floatHeart {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+    }
+
+    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 10px; color: #333; overflow-x: hidden; }
     h1 { text-align: center; color: var(--cor-principal); margin-bottom: 5px; font-size: 1.8rem; }
     p.subtitulo { text-align: center; margin-bottom: 25px; color: #666; font-size: 0.9rem; }
     
-    /* Container Base */
     .grid-presentes {
       display: grid;
       gap: 15px;
@@ -19,27 +31,20 @@
       margin: 0 auto;
     }
 
-    /* --- RESPONSIVIDADE (AS COLUNAS) --- */
-    
-    /* Celular (Até 600px): 2 itens por linha */
+    /* Responsividade */
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       h3 { font-size: 0.85rem !important; }
       .status-text { font-size: 0.7rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
-
-    /* Tablet (601px até 1024px): 3 ou 4 itens por linha */
     @media (min-width: 601px) and (max-width: 1024px) {
       .grid-presentes { grid-template-columns: repeat(3, 1fr); }
     }
-
-    /* Computador (Acima de 1025px): 6 itens por linha */
     @media (min-width: 1025px) {
       .grid-presentes { grid-template-columns: repeat(6, 1fr); }
     }
 
-    /* --- ESTILO DOS CARDS --- */
     .card {
       background: white;
       border-radius: 10px;
@@ -47,13 +52,21 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       display: flex;
       flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: fadeInUp 0.6s ease backwards; /* Animação de entrada */
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
     }
 
     .card-img-container {
       width: 100%;
-      padding-top: 100%; /* Mantém a imagem quadrada */
+      padding-top: 100%;
       position: relative;
       background: #f4f4f4;
+      overflow: hidden;
     }
     
     .card img {
@@ -61,30 +74,18 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       object-fit: cover;
+      transition: transform 0.5s ease;
     }
+
+    .card:hover img { transform: scale(1.1); }
     
-    /* Espaçamento Compacto */
     .card-info { padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; text-align: center; }
     
     h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
-    
     .status-text { font-size: 0.8rem; color: #777; margin-bottom: 2px; }
     
-    /* Barra de Progresso Verde */
-    .progress-bar-bg {
-      background: #eee;
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden;
-      width: 90%;
-      margin: 0 auto;
-    }
-    
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--cor-verde);
-      transition: width 0.5s ease;
-    }
+    .progress-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; width: 90%; margin: 0 auto; }
+    .progress-bar-fill { height: 100%; background: var(--cor-verde); transition: width 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
 
     .btn-presentear {
       background: var(--cor-principal);
@@ -97,10 +98,21 @@
       font-weight: 600;
       font-size: 0.9rem;
       margin-top: 5px;
+      transition: background 0.3s;
     }
 
+    .btn-presentear:active { transform: scale(0.95); }
     .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
-    .card.esgotado { opacity: 0.7; filter: grayscale(0.5); }
+    
+    /* Coração animado via JS */
+    .heart-animation {
+      position: fixed;
+      font-size: 2rem;
+      color: #e74c3c;
+      pointer-events: none;
+      z-index: 10000;
+      animation: floatHeart 2.5s linear forwards;
+    }
   </style>
 </head>
 <body>
@@ -108,8 +120,7 @@
   <h1>Nossa Lista de Casamento 💍</h1>
   <p class="subtitulo">Toque no item para nos presentear</p>
 
-  <div class="grid-presentes" id="lista">
-    </div>
+  <div class="grid-presentes" id="lista"></div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -127,6 +138,8 @@
 
     db.collection("presentes").onSnapshot(function(snapshot) {
       listaDiv.innerHTML = "";
+      var delay = 0;
+
       snapshot.forEach(function(doc) {
         var p = doc.data();
         var id = doc.id;
@@ -137,8 +150,9 @@
 
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
+        card.style.animationDelay = delay + "s"; // Efeito de entrada em cascata
+        delay += 0.05;
 
-        // Montagem usando concatenação simples para evitar erros de caractere
         card.innerHTML = 
           '<div class="card-img-container"><img src="' + p.imagem + '"></div>' +
           '<div class="card-info">' +
@@ -156,9 +170,26 @@
 
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
+        chuvaDeCoracoes(); // Dispara animação
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
-        }).then(function() { alert("Muito obrigado! ❤️"); });
+        }).then(function() { 
+          // Aguarda um pouco a animação antes do alert
+          setTimeout(() => { alert("Muito obrigado! ❤️"); }, 500);
+        });
+      }
+    }
+
+    function chuvaDeCoracoes() {
+      for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.className = 'heart-animation';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.top = '100vh';
+        heart.style.animationDelay = Math.random() * 1 + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 3000);
       }
     }
   </script>
