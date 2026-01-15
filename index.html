@@ -43,24 +43,25 @@
       lista.appendChild(li);
     });
   </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
-    authDomain: "lista-casamento-f19c4.firebaseapp.com",
-    projectId: "lista-casamento-f19c4",
-    storageBucket: "lista-casamento-f19c4.firebasestorage.app",
-    messagingSenderId: "704126420674",
-    appId: "1:704126420674:web:16b47c759235870ace1d5b"
-  };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
+      authDomain: "lista-casamento-f19c4.firebaseapp.com",
+      projectId: "lista-casamento-f19c4",
+      storageBucket: "lista-casamento-f19c4.firebasestorage.app",
+      messagingSenderId: "704126420674",
+      appId: "1:704126420674:web:16b47c759235870ace1d5b"
+    };
 
-  console.log("🔥 Firebase conectado com sucesso!");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-</script>
+    console.log("🔥 Firebase conectado com sucesso!");
+  </script>
+
 </body>
 </html>
