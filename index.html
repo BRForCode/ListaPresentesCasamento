@@ -4,75 +4,105 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nossa Lista de Casamento 💍</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --cor-principal: #d4af37; --cor-fundo: #f8f9fa; }
-    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px; text-align: center; }
+    :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-fundo: #f8f9fa; }
+    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 10px; color: #333; }
+    h1 { text-align: center; color: var(--cor-principal); margin-bottom: 10px; }
+    p.subtitulo { text-align: center; margin-bottom: 30px; color: #666; }
     
     .grid-presentes {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      max-width: 1200px;
-      margin: 40px auto;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
     .card {
       background: white;
-      border-radius: 15px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
       display: flex;
       flex-direction: column;
-      transition: 0.3s;
     }
 
-    .card img { width: 100%; height: 220px; object-fit: cover; background: #eee; border-bottom: 1px solid #eee; }
-    .info { padding: 20px; }
+    .card:hover { transform: translateY(-3px); }
+
+    /* 1. Imagem Quadrada */
+    .card-img-container {
+      width: 100%;
+      padding-top: 100%; /* Cria um quadrado perfeito (aspect-ratio 1:1) */
+      position: relative;
+      background: #f4f4f4;
+    }
     
-    .status {
-      display: inline-block;
-      padding: 5px 15px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      margin-bottom: 15px;
-      background: #f0f0f0;
-      color: #555;
+    .card img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; /* Preenche o quadrado sem distorcer */
+      object-position: center;
     }
-
-    h3 { margin: 10px 0; font-size: 1.2rem; color: #333; }
+    
+    /* 3. Espaçamento Reduzido */
+    .card-info { padding: 15px; display: flex; flex-direction: column; gap: 8px; text-align: center; }
+    
+    h3 { margin: 0; font-size: 1.1rem; font-weight: 600; color: #444; }
+    
+    /* Estilo do Texto de Status */
+    .status-text { font-size: 0.85rem; color: #777; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 2px; }
+    
+    /* 2. Barra de Progresso Verde */
+    .progress-bar-bg {
+      background: #eee;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 80%; /* Barra não ocupa 100% da largura */
+      margin: 0 auto 5px auto; /* Centraliza e dá espaço inferior */
+    }
+    
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--cor-verde);
+      transition: width 0.5s ease-in-out;
+    }
 
     .btn-presentear {
       background: var(--cor-principal);
       color: white;
       border: none;
-      padding: 12px;
+      padding: 10px;
       width: 100%;
-      border-radius: 8px;
+      border-radius: 25px;
       cursor: pointer;
       font-weight: 600;
-      margin-top: 10px;
+      font-size: 0.95rem;
+      transition: background 0.2s;
     }
 
-    .btn-presentear:disabled { background: #ccc; cursor: not-allowed; }
-    .esgotado { opacity: 0.7; filter: grayscale(1); }
+    .btn-presentear:hover:not(:disabled) { background: #b8962d; }
+    .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
+    .card.esgotado { opacity: 0.7; }
+    .card.esgotado img { filter: grayscale(0.8); }
   </style>
 </head>
 <body>
 
-  <h1>Nossa Lista de Presentes 💍</h1>
-  <p>Toque no item que deseja nos presentear</p>
+  <h1>Nossa Lista de Casamento 💍</h1>
+  <p class="subtitulo">Escolha com carinho um presente para nós!</p>
 
   <div class="grid-presentes" id="lista">
-    <p id="loading">Carregando presentes...</p>
+    <p style="text-align: center; grid-column: 1/-1;">Carregando lista...</p>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
-    // Configuração do Firebase
     var firebaseConfig = {
       apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
       authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -83,62 +113,63 @@
     var db = firebase.firestore();
     var listaDiv = document.getElementById("lista");
 
-    // Escutando os dados em tempo real
     db.collection("presentes").onSnapshot(function(snapshot) {
       if (snapshot.empty) {
-        listaDiv.innerHTML = "<p>Nenhum presente encontrado no banco de dados.</p>";
+        listaDiv.innerHTML = "<p>A lista está vazia no momento.</p>";
         return;
       }
 
-      listaDiv.innerHTML = ""; // Remove o texto de carregamento
+      listaDiv.innerHTML = "";
 
       snapshot.forEach(function(doc) {
         var p = doc.data();
         var id = doc.id;
 
-        // Validando dados do Firestore (visto na sua imagem)
         var total = p.total || 1;
         var recebidos = p.recebidos || 0;
         var nome = p.nome || "Presente";
-        var imagem = p.imagem || "https://via.placeholder.com/300";
+        var imagem = p.imagem || "https://via.placeholder.com/300?text=Sem+Foto";
         var esgotado = recebidos >= total;
 
-        // Criando o elemento do Card
+        // Cálculo da porcentagem para a barra
+        var porcentagem = Math.min((recebidos / total) * 100, 100);
+
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
 
-        // Variáveis auxiliares para o texto
-        var textoStatus = esgotado ? "❌ Esgotado" : "🎁 Recebidos: " + recebidos + " de " + total;
-        var textoBotao = esgotado ? "Indisponível" : "Escolher este";
-        var atributoDisabled = esgotado ? "disabled" : "";
+        var btnTexto = esgotado ? "Esgotado" : "Escolher este";
+        var btnDisabled = esgotado ? "disabled" : "";
 
-        // Montando o HTML interno sem usar o caractere '$' problemático
+        // HTML montado com a nova estrutura
         card.innerHTML = 
-          '<img src="' + imagem + '" alt="' + nome + '">' +
-          '<div class="info">' +
-            '<span class="status">' + textoStatus + '</span>' +
+          '<div class="card-img-container">' +
+            '<img src="' + imagem + '" alt="' + nome + '">' +
+          '</div>' +
+          '<div class="card-info">' +
+            '<div class="status-text">🎁 Recebidos: ' + recebidos + ' de ' + total + '</div>' +
+            // Barra de Progresso
+            '<div class="progress-bar-bg">' +
+              '<div class="progress-bar-fill" style="width: ' + porcentagem + '%"></div>' +
+            '</div>' +
             '<h3>' + nome + '</h3>' +
-            '<button class="btn-presentear" ' + atributoDisabled + ' onclick="confirmar(\'' + id + '\')">' +
-              textoBotao +
+            '<button class="btn-presentear" ' + btnDisabled + ' onclick="confirmar(\'' + id + '\')">' +
+              btnTexto +
             '</button>' +
           '</div>';
 
         listaDiv.appendChild(card);
       });
     }, function(error) {
-      console.error("Erro no Firebase:", error);
-      listaDiv.innerHTML = "<p style='color:red'>Erro de permissão ou conexão.</p>";
+      console.error("Erro:", error);
+      listaDiv.innerHTML = "<p style='color:red; text-align:center'>Erro ao carregar a lista.</p>";
     });
 
-    // Função para confirmar o presente
     function confirmar(id) {
-      if(confirm("Deseja confirmar que dará este presente?")) {
+      if(confirm("Confirmar a escolha deste presente?")) {
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
         }).then(function() {
-          alert("Muito obrigado! Recebemos sua confirmação. ❤️");
-        }).catch(function(err) {
-          alert("Erro ao confirmar. Verifique as regras do banco de dados.");
+          alert("Obrigado! Sua escolha foi registrada. ❤️");
         });
       }
     }
