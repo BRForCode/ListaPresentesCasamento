@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Lista de Casamento</title>
 </head>
 <body>
@@ -12,7 +12,7 @@
   <li>Carregando presentes...</li>
 </ul>
 
-<!-- Firebase compat (SEM module) -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -20,27 +20,27 @@
   firebase.initializeApp({
     apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
     authDomain: "lista-casamento-f19c4.firebaseapp.com",
-    projectId: "lista-casamento-f19c4",
+    projectId: "lista-casamento-f19c4"
   });
 
-  const db = firebase.firestore();
+  var db = firebase.firestore();
 </script>
 
 <script>
-  const lista = document.getElementById("lista-presentes");
+  var lista = document.getElementById("lista-presentes");
 
-  db.collection("presentes").onSnapshot(snapshot => {
-    console.log("Snapshot recebido:", snapshot.size);
-
+  db.collection("presentes").onSnapshot(function(snapshot) {
     lista.innerHTML = "";
 
-    snapshot.forEach(doc => {
-      const p = doc.data();
-      const li = document.createElement("li");
+    snapshot.forEach(function(doc) {
+      var p = doc.data();
+      var li = document.createElement("li");
 
-      li.textContent = p.escolhido
-        ? ${p.nome} — ❌ Já escolhido
-        : p.nome;
+      if (p.escolhido === true) {
+        li.textContent = p.nome + " — ❌ Já escolhido";
+      } else {
+        li.textContent = p.nome;
+      }
 
       lista.appendChild(li);
     });
