@@ -8,13 +8,11 @@
 <body>
 
   <h1>Lista de Casamento 💍</h1>
-
   <p>Escolha um presente disponível:</p>
 
-  <ul id="lista-presentes">
-    <li>Carregando presentes...</li>
-  </ul>
+  <ul id="lista-presentes"></ul>
 
+  <!-- SCRIPT DA LISTA (SIMULAÇÃO LOCAL) -->
   <script>
     const presentes = [
       { nome: "Air Fryer", escolhido: false },
@@ -23,7 +21,6 @@
     ];
 
     const lista = document.getElementById("lista-presentes");
-    lista.innerHTML = "";
 
     presentes.forEach(presente => {
       const li = document.createElement("li");
@@ -36,7 +33,6 @@
         btn.onclick = () => {
           alert(Você escolheu: ${presente.nome});
         };
-
         li.appendChild(btn);
       }
 
@@ -44,10 +40,11 @@
     });
   </script>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  <!-- FIREBASE (VERSÃO COMPATÍVEL – ESTÁVEL) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
       authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -57,10 +54,10 @@
       appId: "1:704126420674:web:16b47c759235870ace1d5b"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    console.log("🔥 Firebase conectado com sucesso!");
+    console.log("🔥 Firebase conectado com sucesso (modo compat)!");
   </script>
 
 </body>
