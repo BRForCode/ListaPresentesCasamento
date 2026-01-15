@@ -3,42 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin - Lista de Casamento ⚙️</title>
+  <title>Admin Full - Lista de Casamento ⚙️</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Estilos para bloquear a página até digitar a senha */
     #bloqueio { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; }
-    
     body { font-family: 'Montserrat', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #d4af37; }
     
-    /* Formulário */
     .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
     label { font-weight: 600; margin-bottom: 5px; }
     input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
     button#btn-adicionar { background: #27ae60; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     
-    /* Lista de Itens */
     .lista-admin { margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px; }
-    .item-admin { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #eee; flex-wrap: wrap; }
-    .item-admin img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-    .info-item { flex-grow: 1; min-width: 200px; }
+    .item-admin { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
     
-    /* Controles de Quantidade */
-    .controles-qtd { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; }
-    .input-mini { width: 50px; padding: 5px; text-align: center; }
-    .btn-save-qtd { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .btn-excluir { background: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-left: auto; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .col { display: flex; flex-direction: column; flex-grow: 1; }
+    .col label { font-size: 12px; color: #666; }
+    
+    .item-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+    .item-header img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+
+    .input-edit { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; }
+    .btn-save-all { background: #3498db; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-excluir { background: #e74c3c; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; }
   </style>
 </head>
 <body>
 
 <div id="bloqueio">
   <div style="text-align:center">
-    <h2>Página Protegida</h2>
-    <p>Digite a senha para gerenciar os presentes:</p>
-    <input type="password" id="senhaInput" placeholder="Sua senha">
+    <h2>Acesso Restrito</h2>
+    <input type="password" id="senhaInput" placeholder="Senha do Admin">
     <button onclick="verificarSenha()" style="padding: 10px 20px; cursor:pointer">Entrar</button>
   </div>
 </div>
@@ -46,22 +44,25 @@
 <div class="container">
   <h1>Gerenciar Presentes 🎁</h1>
 
-  <div class="form-group">
-    <label>Nome do Presente:</label>
-    <input type="text" id="nome" placeholder="Ex: Jogo de Panelas">
+  <div style="background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc;">
+    <h3>Adicionar Novo Item</h3>
+    <div class="form-group">
+      <label>Nome:</label>
+      <input type="text" id="nome" placeholder="Ex: Air Fryer">
+    </div>
+    <div class="form-group">
+      <label>Link da Imagem:</label>
+      <input type="text" id="imagem" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label>Quantidade Total:</label>
+      <input type="number" id="total" value="1" min="1">
+    </div>
+    <button id="btn-adicionar" onclick="adicionarPresente()">Cadastrar Presente</button>
   </div>
-  <div class="form-group">
-    <label>Link da Imagem:</label>
-    <input type="text" id="imagem" placeholder="https://link-da-foto.jpg">
-  </div>
-  <div class="form-group">
-    <label>Quantidade Total (Cotas):</label>
-    <input type="number" id="total" value="1" min="1">
-  </div>
-  <button id="btn-adicionar" onclick="adicionarPresente()">Adicionar à Lista</button>
 
   <div class="lista-admin">
-    <h2>Itens Atuais</h2>
+    <h2>Itens na Lista (Edição)</h2>
     <div id="lista-itens-admin">Carregando...</div>
   </div>
 </div>
@@ -70,8 +71,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // 1. LOGIN SIMPLES
-  // Mude '1234' para a senha que você desejar!
   function verificarSenha() {
     var senhaDigitada = document.getElementById("senhaInput").value;
     if (senhaDigitada === "1234") { 
@@ -81,7 +80,6 @@
     }
   }
 
-  // 2. CONFIGURAÇÃO FIREBASE
   var firebaseConfig = {
     apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
     authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -91,71 +89,86 @@
   firebase.initializeApp(firebaseConfig);
   var db = firebase.firestore();
 
-  // ADICIONAR NOVO
   function adicionarPresente() {
     var nome = document.getElementById("nome").value;
     var imagem = document.getElementById("imagem").value;
     var total = parseInt(document.getElementById("total").value);
 
-    if (nome === "" || imagem === "") { alert("Preencha tudo!"); return; }
+    if (!nome || !imagem) { alert("Preencha Nome e Imagem!"); return; }
 
     db.collection("presentes").add({
       nome: nome, imagem: imagem, total: total, recebidos: 0
-    }).then(function() {
-      alert("Adicionado!");
+    }).then(() => {
+      alert("Adicionado com sucesso!");
       document.getElementById("nome").value = "";
       document.getElementById("imagem").value = "";
     });
   }
 
-  // LISTAR E ATUALIZAR
-  db.collection("presentes").onSnapshot(function(snapshot) {
+  db.collection("presentes").onSnapshot((snapshot) => {
     var listaDiv = document.getElementById("lista-itens-admin");
     listaDiv.innerHTML = "";
 
-    snapshot.forEach(function(doc) {
+    snapshot.forEach((doc) => {
       var p = doc.data();
       var id = doc.id;
 
       var item = document.createElement("div");
       item.className = "item-admin";
-      item.innerHTML = 
-        '<img src="' + p.imagem + '">' +
-        '<div class="info-item">' +
-          '<strong>' + p.nome + '</strong><br>' +
-          '<div class="controles-qtd">' +
-            'Total: ' + p.total + ' | Recebidos: ' +
-            '<input type="number" id="rec-' + id + '" value="' + p.recebidos + '" class="input-mini">' +
-            '<button class="btn-save-qtd" onclick="ajustarRecebidos(\'' + id + '\')">Salvar Qtd</button>' +
-          '</div>' +
-        '</div>' +
-        '<button class="btn-excluir" onclick="excluirItem(\'' + id + '\')">Excluir Item</button>';
-      
+      item.innerHTML = `
+        <div class="item-header">
+          <img src="${p.imagem}" alt="Preview">
+          <div style="flex-grow:1">
+            <label>Nome do Presente:</label>
+            <input type="text" id="nome-${id}" value="${p.nome}" class="input-edit">
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col" style="flex-[2]">
+            <label>Link da Imagem:</label>
+            <input type="text" id="img-${id}" value="${p.imagem}" class="input-edit">
+          </div>
+          <div class="col" style="width:80px">
+            <label>Total:</label>
+            <input type="number" id="total-${id}" value="${p.total}" class="input-edit">
+          </div>
+          <div class="col" style="width:80px">
+            <label>Recebidos:</label>
+            <input type="number" id="rec-${id}" value="${p.recebidos}" class="input-edit">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn-save-all" style="flex-grow:1" onclick="salvarAlteracoes('${id}')">Salvar Alterações</button>
+          <button class="btn-excluir" onclick="excluirItem('${id}')">Excluir</button>
+        </div>
+      `;
       listaDiv.appendChild(item);
     });
   });
 
-  // FUNÇÃO PARA ALTERAR QUANTIDADE DE RECEBIDOS
-  function ajustarRecebidos(id) {
-    var novaQtd = parseInt(document.getElementById("rec-" + id).value);
-    
-    if (isNaN(novaQtd) || novaQtd < 0) {
-      alert("Insira um número válido.");
-      return;
-    }
+  function salvarAlteracoes(id) {
+    var novoNome = document.getElementById("nome-" + id).value;
+    var novaImg = document.getElementById("img-" + id).value;
+    var novoTotal = parseInt(document.getElementById("total-" + id).value);
+    var novosRec = parseInt(document.getElementById("rec-" + id).value);
 
     db.collection("presentes").doc(id).update({
-      recebidos: novaQtd
-    }).then(function() {
-      alert("Quantidade atualizada com sucesso!");
-    }).catch(function(err) {
-      alert("Erro ao atualizar.");
+      nome: novoNome,
+      imagem: novaImg,
+      total: novoTotal,
+      recebidos: novosRec
+    }).then(() => {
+      alert("Alterações salvas para: " + novoNome);
+    }).catch((err) => {
+      alert("Erro ao salvar!");
+      console.error(err);
     });
   }
 
-  // EXCLUIR ITEM
   function excluirItem(id) {
-    if (confirm("Apagar presente definitivamente?")) {
+    if (confirm("Deseja mesmo remover este presente da lista?")) {
       db.collection("presentes").doc(id).delete();
     }
   }
