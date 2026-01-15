@@ -14,14 +14,13 @@
 
     /* Telas de Bloqueio e Menu */
     #bloqueio, #menu-inicial { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-    #menu-inicial { display: none; z-index: 9998; } /* Menu fica abaixo do bloqueio inicial */
+    #menu-inicial { display: none; z-index: 9998; }
 
     .btn-menu { width: 250px; padding: 20px; margin: 10px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; color: white; }
     .btn-p { background: var(--cor-principal); }
     .btn-m { background: var(--cor-azul); }
     .btn-menu:hover { transform: scale(1.05); filter: brightness(1.1); }
 
-    /* Seções (Escondidas por padrão) */
     .secao-admin { display: none; }
     .btn-voltar { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
 
@@ -34,6 +33,8 @@
 
     /* Estilos de Mensagens */
     .msg-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .msg-inputs { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; }
+    .label-mini { font-size: 10px; color: #999; text-transform: uppercase; font-weight: bold; }
     
     button { cursor: pointer; font-weight: 600; transition: 0.2s; }
     .btn-save { background: var(--cor-azul); color: white; border: none; padding: 10px; border-radius: 5px; }
@@ -59,7 +60,6 @@
 
     <div id="secao-presentes" class="secao-admin">
       <h1>Gerenciar Presentes</h1>
-      
       <div class="form-novo">
         <h3>Adicionar Novo Item</h3>
         <input type="text" id="nome" placeholder="Nome" class="input-edit" style="margin-bottom: 5px;">
@@ -67,7 +67,6 @@
         <input type="number" id="total" value="1" min="1" class="input-edit" style="margin-bottom: 5px;">
         <button onclick="adicionarPresente()" class="btn-save" style="width:100%; background: var(--cor-verde);">Cadastrar Presente</button>
       </div>
-
       <div id="lista-presentes">Carregando...</div>
     </div>
 
@@ -81,7 +80,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
-    // --- LÓGICA DE NAVEGAÇÃO ---
     function verificarSenha() {
       if (document.getElementById("senhaInput").value === "1234") {
         document.getElementById("bloqueio").style.display = "none";
@@ -100,7 +98,6 @@
       document.querySelectorAll('.secao-admin').forEach(s => s.style.display = "none");
     }
 
-    // --- CONFIGURAÇÃO FIREBASE ---
     var firebaseConfig = {
       apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
       authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -109,7 +106,7 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
-    // --- FUNÇÕES DE PRESENTES ---
+    // --- PRESENTES ---
     function adicionarPresente() {
       var n = document.getElementById("nome").value, i = document.getElementById("imagem").value, t = parseInt(document.getElementById("total").value);
       if (!n || !i) return alert("Preencha tudo!");
@@ -129,12 +126,14 @@
         item.innerHTML = `
           <div class="item-header"><img src="${p.imagem}"><strong>${p.nome}</strong></div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:10px;">
-            <label>Total: <input type="number" id="t-${id}" value="${p.total}" class="input-edit"></label>
-            <label>Rec: <input type="number" id="r-${id}" value="${p.recebidos}" class="input-edit"></label>
+            <label class="label-mini">Total</label><label class="label-mini">Recebidos</label>
+            <input type="number" id="t-${id}" value="${p.total}" class="input-edit">
+            <input type="number" id="r-${id}" value="${p.recebidos}" class="input-edit">
           </div>
+          <label class="label-mini">URL da Imagem</label>
           <input type="text" id="i-${id}" value="${p.imagem}" class="input-edit" style="margin-bottom:10px;">
-          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar</button>
-          <button class="btn-del" style="width:25%" onclick="excluirP('${id}')">X</button>`;
+          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar Alterações</button>
+          <button class="btn-del" style="width:25%" onclick="excluirP('${id}')">Excluir</button>`;
         div.appendChild(item);
       });
     });
@@ -144,12 +143,12 @@
         total: parseInt(document.getElementById("t-"+id).value),
         recebidos: parseInt(document.getElementById("r-"+id).value),
         imagem: document.getElementById("i-"+id).value
-      }).then(() => alert("Salvo!"));
+      }).then(() => alert("Presente atualizado!"));
     }
 
     function excluirP(id) { if(confirm("Excluir presente?")) db.collection("presentes").doc(id).delete(); }
 
-    // --- FUNÇÕES DE MENSAGENS ---
+    // --- MENSAGENS (COM EDIÇÃO DE NOME) ---
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(snap => {
       var div = document.getElementById("lista-mensagens");
       div.innerHTML = "";
@@ -158,15 +157,30 @@
         var card = document.createElement("div");
         card.className = "msg-card";
         card.innerHTML = `
-          <div style="flex-grow:1"><strong>${m.nome}:</strong><br>
-          <input type="text" id="mt-${id}" value="${m.texto}" class="input-edit"></div>
-          <button onclick="salvarM('${id}')">💾</button>
-          <button class="btn-del" onclick="excluirM('${id}')">🗑️</button>`;
+          <div class="msg-inputs">
+            <label class="label-mini">Nome do Convidado</label>
+            <input type="text" id="mn-${id}" value="${m.nome}" class="input-edit" style="font-weight: bold;">
+            <label class="label-mini">Mensagem</label>
+            <input type="text" id="mt-${id}" value="${m.texto}" class="input-edit">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <button class="btn-save" onclick="salvarM('${id}')">💾</button>
+            <button class="btn-del" onclick="excluirM('${id}')">🗑️</button>
+          </div>`;
         div.appendChild(card);
       });
     });
 
-    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Mensagem atualizada!")); }
+    function salvarM(id) { 
+      var novoNome = document.getElementById("mn-"+id).value;
+      var novoTexto = document.getElementById("mt-"+id).value;
+      
+      db.collection("mensagens").doc(id).update({ 
+        nome: novoNome,
+        texto: novoTexto 
+      }).then(() => alert("Mensagem e nome atualizados!")); 
+    }
+
     function excluirM(id) { if(confirm("Excluir mensagem?")) db.collection("mensagens").doc(id).delete(); }
   </script>
 </body>
