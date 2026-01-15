@@ -27,7 +27,7 @@
       transition: 0.3s;
     }
 
-    .card img { width: 100%; height: 220px; object-fit: cover; background: #eee; }
+    .card img { width: 100%; height: 220px; object-fit: cover; background: #eee; border-bottom: 1px solid #eee; }
     .info { padding: 20px; }
     
     .status {
@@ -38,7 +38,10 @@
       font-weight: bold;
       margin-bottom: 15px;
       background: #f0f0f0;
+      color: #555;
     }
+
+    h3 { margin: 10px 0; font-size: 1.2rem; color: #333; }
 
     .btn-presentear {
       background: var(--cor-principal);
@@ -49,10 +52,11 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
+      margin-top: 10px;
     }
 
     .btn-presentear:disabled { background: #ccc; cursor: not-allowed; }
-    .esgotado { opacity: 0.6; filter: grayscale(1); }
+    .esgotado { opacity: 0.7; filter: grayscale(1); }
   </style>
 </head>
 <body>
@@ -68,64 +72,74 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
-    // Sua configuração original
-    const firebaseConfig = {
+    // Configuração do Firebase
+    var firebaseConfig = {
       apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
       authDomain: "lista-casamento-f19c4.firebaseapp.com",
       projectId: "lista-casamento-f19c4"
     };
 
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const listaDiv = document.getElementById("lista");
+    var db = firebase.firestore();
+    var listaDiv = document.getElementById("lista");
 
-    // Lendo os dados
-    db.collection("presentes").onSnapshot((snapshot) => {
-      console.log("Dados recebidos do Firebase:", snapshot.size, "itens encontrados.");
-      
+    // Escutando os dados em tempo real
+    db.collection("presentes").onSnapshot(function(snapshot) {
       if (snapshot.empty) {
         listaDiv.innerHTML = "<p>Nenhum presente encontrado no banco de dados.</p>";
         return;
       }
 
-      listaDiv.innerHTML = ""; // Limpa o carregando
+      listaDiv.innerHTML = ""; // Remove o texto de carregamento
 
-      snapshot.forEach((doc) => {
-        const p = doc.data();
-        const id = doc.id;
+      snapshot.forEach(function(doc) {
+        var p = doc.data();
+        var id = doc.id;
 
-        // Garante que os valores existam para não quebrar o código
-        const total = p.total || 1;
-        const recebidos = p.recebidos || 0;
-        const nome = p.nome || "Presente sem nome";
-        const imagem = p.imagem || "https://via.placeholder.com/300?text=Sem+Foto";
-        
-        const esgotado = recebidos >= total;
+        // Validando dados do Firestore (visto na sua imagem)
+        var total = p.total || 1;
+        var recebidos = p.recebidos || 0;
+        var nome = p.nome || "Presente";
+        var imagem = p.imagem || "https://via.placeholder.com/300";
+        var esgotado = recebidos >= total;
 
-        const card = document.createElement("div");
-        card.className = card ${esgotado ? 'esgotado' : ''};
-        card.innerHTML = `
-          <img src="${imagem}" alt="${nome}">
-          <div class="info">
-            <span class="status">${esgotado ? "❌ Esgotado" : 🎁 Recebidos: ${recebidos} de ${total}}</span>
-            <h3>${nome}</h3>
-            <button class="btn-presentear" ${esgotado ? 'disabled' : ''} onclick="confirmar('${id}')">
-              ${esgotado ? 'Já escolhido' : 'Escolher este'}
-            </button>
-          </div>
-        `;
+        // Criando o elemento do Card
+        var card = document.createElement("div");
+        card.className = "card" + (esgotado ? " esgotado" : "");
+
+        // Variáveis auxiliares para o texto
+        var textoStatus = esgotado ? "❌ Esgotado" : "🎁 Recebidos: " + recebidos + " de " + total;
+        var textoBotao = esgotado ? "Indisponível" : "Escolher este";
+        var atributoDisabled = esgotado ? "disabled" : "";
+
+        // Montando o HTML interno sem usar o caractere '$' problemático
+        card.innerHTML = 
+          '<img src="' + imagem + '" alt="' + nome + '">' +
+          '<div class="info">' +
+            '<span class="status">' + textoStatus + '</span>' +
+            '<h3>' + nome + '</h3>' +
+            '<button class="btn-presentear" ' + atributoDisabled + ' onclick="confirmar(\'' + id + '\')">' +
+              textoBotao +
+            '</button>' +
+          '</div>';
+
         listaDiv.appendChild(card);
       });
-    }, (error) => {
-      console.error("Erro ao ler o Firebase:", error);
-      listaDiv.innerHTML = <p style="color:red">Erro de permissão ou conexão. Verifique as Regras do Firebase.</p>;
+    }, function(error) {
+      console.error("Erro no Firebase:", error);
+      listaDiv.innerHTML = "<p style='color:red'>Erro de permissão ou conexão.</p>";
     });
 
+    // Função para confirmar o presente
     function confirmar(id) {
       if(confirm("Deseja confirmar que dará este presente?")) {
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
-        }).then(() => alert("Muito obrigado! ❤️"));
+        }).then(function() {
+          alert("Muito obrigado! Recebemos sua confirmação. ❤️");
+        }).catch(function(err) {
+          alert("Erro ao confirmar. Verifique as regras do banco de dados.");
+        });
       }
     }
   </script>
