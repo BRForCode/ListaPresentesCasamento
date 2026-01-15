@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+[14:05, 15/01/2026] Luiz Henrique: https://lista-presentes-casamento-iota.vercel.app/
+[14:18, 15/01/2026] Luiz Henrique: <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -6,116 +7,66 @@
   <title>Nossa Lista de Casamento 💍</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --cor-principal: #d4af37; /* Dourado */
-      --cor-fundo: #f9f9f9;
-      --cor-texto: #333;
-    }
-
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: var(--cor-fundo);
-      color: var(--cor-texto);
-      margin: 0;
-      padding: 20px;
-    }
-
-    header {
-      text-align: center;
-      padding: 40px 0;
-    }
-
-    h1 {
-      font-weight: 300;
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-
-    /* Container Responsivo */
-    .container-presentes {
+    :root { --cor-principal: #d4af37; --cor-fundo: #f4f4f4; --cor-texto: #333; }
+    body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px; color: var(--cor-texto); }
+    header { text-align: center; padding: 30px 0; }
+    
+    .grid-presentes {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      max-width: 1200px;
+      gap: 20px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
-    /* Estilo do Card */
     .card {
-      background: white;
-      border-radius: 15px;
+      background: #fff;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
+      transition: 0.3s;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .card-info {
-      padding: 20px;
-      text-align: center;
-      flex-grow: 1;
-    }
-
-    .card-info h3 {
-      margin: 0 0 10px 0;
-      font-size: 1.2rem;
-    }
-
-    /* Status e Botão */
-    .status {
-      font-weight: bold;
-      margin-bottom: 15px;
-      display: block;
-    }
-
-    .disponivel { color: #27ae60; }
-    .escolhido { 
-      color: #e74c3c; 
-      filter: grayscale(1);
-      opacity: 0.7;
+    .card img { width: 100%; height: 200px; object-fit: cover; }
+    .info { padding: 15px; text-align: center; flex-grow: 1; }
+    
+    /* Estilo do Contador/Status */
+    .contador {
+      background: #eee;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.85rem;
+      display: inline-block;
+      margin-bottom: 10px;
+      font-weight: 600;
     }
 
     .btn-presentear {
-      background-color: var(--cor-principal);
-      color: white;
+      background: var(--cor-principal);
+      color: #fff;
       border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
+      padding: 12px;
+      width: 100%;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      width: 100%;
-      transition: background 0.3s;
+      transition: 0.3s;
     }
 
-    .btn-presentear:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    .btn-presentear:hover:not(:disabled) {
-      background-color: #b8962d;
-    }
+    .btn-presentear:disabled { background: #ccc; cursor: not-allowed; }
+    .esgotado { filter: grayscale(1); opacity: 0.6; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>Lista de Casamento 💍</h1>
-  <p>Escolha um presente para nos ajudar a montar nosso novo lar!</p>
+  <p>Escolha um presente para nos presentear!</p>
 </header>
 
-<div class="container-presentes" id="grid-presentes">
+<div class="grid-presentes" id="lista">
   <p style="text-align: center; grid-column: 1/-1;">Carregando presentes...</p>
 </div>
 
@@ -123,7 +74,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // Sua configuração (mantenha a mesma)
   firebase.initializeApp({
     apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
     authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -131,48 +81,48 @@
   });
 
   var db = firebase.firestore();
-  var grid = document.getElementById("grid-presentes");
+  var listaDiv = document.getElementById("lista");
 
-  // Escutar atualizações do Firestore
   db.collection("presentes").onSnapshot(function(snapshot) {
-    grid.innerHTML = "";
+    listaDiv.innerHTML = "";
 
     snapshot.forEach(function(doc) {
       var p = doc.data();
       var id = doc.id;
 
-      // Criar o Card
+      // Lógica de quantidade: se não existir o campo 'total', assume que é 1 (item único)
+      var total = p.total || 1;
+      var recebidos = p.recebidos || 0;
+      var esgotado = recebidos >= total;
+
       var card = document.createElement("div");
-      card.className = "card" + (p.escolhido ? " escolhido" : "");
+      card.className = "card" + (esgotado ? " esgotado" : "");
 
       card.innerHTML = `
         <img src="${p.imagem || 'https://via.placeholder.com/300'}" alt="${p.nome}">
-        <div class="card-info">
+        <div class="info">
           <h3>${p.nome}</h3>
-          <span class="status ${p.escolhido ? 'escolhido' : 'disponivel'}">
-            ${p.escolhido ? '❌ Já escolhido' : '✅ Disponível'}
-          </span>
+          <div class="contador">
+            ${esgotado ? "❌ Esgotado" : 🎁 Recebidos: ${recebidos} de ${total}}
+          </div>
           <button class="btn-presentear" 
-                  ${p.escolhido ? 'disabled' : ''} 
-                  onclick="escolherPresente('${id}')">
-            ${p.escolhido ? 'Indisponível' : 'Presentear'}
+                  ${esgotado ? "disabled" : ""} 
+                  onclick="confirmarPresente('${id}', ${recebidos})">
+            ${esgotado ? "Já escolhido" : "Dar este presente"}
           </button>
         </div>
       `;
-
-      grid.appendChild(card);
+      listaDiv.appendChild(card);
     });
   });
 
-  // Função para marcar como escolhido
-  function escolherPresente(id) {
-    if(confirm("Deseja realmente escolher este presente?")) {
+  function confirmarPresente(id, recebidosAtual) {
+    if (confirm("Você confirma que deseja dar este presente?")) {
+      // Incrementa o contador 'recebidos' no Firebase
       db.collection("presentes").doc(id).update({
-        escolhido: true
+        recebidos: firebase.firestore.FieldValue.increment(1)
       }).then(() => {
-        alert("Obrigado! Você escolheu o presente.");
-      }).catch((error) => {
-        console.error("Erro ao atualizar: ", error);
+        alert("Muito obrigado! ❤️");
       });
     }
   }
