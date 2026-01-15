@@ -3,176 +3,171 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Full - Lista de Casamento ⚙️</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <title>Painel Administrativo - Patricia & Luiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    #bloqueio { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; }
-    body { font-family: 'Montserrat', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
+    :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-vermelho: #e74c3c; --cor-azul: #3498db; }
+    
+    body { font-family: 'Montserrat', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; margin: 0; }
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; color: #d4af37; }
-    
-    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-    label { font-weight: 600; margin-bottom: 5px; }
-    input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-    button#btn-adicionar { background: #27ae60; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    
-    .lista-admin { margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px; }
-    .item-admin { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
-    
-    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .col { display: flex; flex-direction: column; flex-grow: 1; }
-    .col label { font-size: 12px; color: #666; }
-    
-    .item-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-    .item-header img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+    h1, h2 { text-align: center; color: var(--cor-principal); }
 
-    .input-edit { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; }
-    .btn-save-all { background: #3498db; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-    .btn-excluir { background: #e74c3c; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; }
+    /* Telas de Bloqueio e Menu */
+    #bloqueio, #menu-inicial { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    #menu-inicial { display: none; z-index: 9998; } /* Menu fica abaixo do bloqueio inicial */
+
+    .btn-menu { width: 250px; padding: 20px; margin: 10px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; color: white; }
+    .btn-p { background: var(--cor-principal); }
+    .btn-m { background: var(--cor-azul); }
+    .btn-menu:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+    /* Seções (Escondidas por padrão) */
+    .secao-admin { display: none; }
+    .btn-voltar { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+
+    /* Estilos de Presentes */
+    .form-novo { background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc; margin-bottom: 30px; }
+    .input-edit { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    .item-admin { border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+    .item-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+    .item-header img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+
+    /* Estilos de Mensagens */
+    .msg-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    
+    button { cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .btn-save { background: var(--cor-azul); color: white; border: none; padding: 10px; border-radius: 5px; }
+    .btn-del { background: var(--cor-vermelho); color: white; border: none; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
 
-<div id="bloqueio">
-  <div style="text-align:center">
+  <div id="bloqueio">
     <h2>Acesso Restrito</h2>
-    <input type="password" id="senhaInput" placeholder="Senha do Admin">
-    <button onclick="verificarSenha()" style="padding: 10px 20px; cursor:pointer">Entrar</button>
-  </div>
-</div>
-
-<div class="container">
-  <h1>Gerenciar Presentes 🎁</h1>
-
-  <div style="background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc;">
-    <h3>Adicionar Novo Item</h3>
-    <div class="form-group">
-      <label>Nome:</label>
-      <input type="text" id="nome" placeholder="Ex: Air Fryer">
-    </div>
-    <div class="form-group">
-      <label>Link da Imagem:</label>
-      <input type="text" id="imagem" placeholder="https://...">
-    </div>
-    <div class="form-group">
-      <label>Quantidade Total:</label>
-      <input type="number" id="total" value="1" min="1">
-    </div>
-    <button id="btn-adicionar" onclick="adicionarPresente()">Cadastrar Presente</button>
+    <input type="password" id="senhaInput" placeholder="Senha do Admin" style="padding: 10px; margin-bottom: 10px;">
+    <button onclick="verificarSenha()" style="padding: 10px 20px;">Entrar</button>
   </div>
 
-  <div class="lista-admin">
-    <h2>Itens na Lista (Edição)</h2>
-    <div id="lista-itens-admin">Carregando...</div>
+  <div id="menu-inicial">
+    <h2>O que deseja alterar?</h2>
+    <button class="btn-menu btn-p" onclick="mostrarSecao('presentes')">🎁 Presentes</button>
+    <button class="btn-menu btn-m" onclick="mostrarSecao('mensagens')">📝 Mensagens</button>
   </div>
-</div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <div class="container">
+    <button class="btn-voltar" onclick="voltarAoMenu()">← Voltar ao Menu</button>
 
-<script>
-  function verificarSenha() {
-    var senhaDigitada = document.getElementById("senhaInput").value;
-    if (senhaDigitada === "1234") { 
-      document.getElementById("bloqueio").style.display = "none";
-    } else {
-      alert("Senha incorreta!");
+    <div id="secao-presentes" class="secao-admin">
+      <h1>Gerenciar Presentes</h1>
+      
+      <div class="form-novo">
+        <h3>Adicionar Novo Item</h3>
+        <input type="text" id="nome" placeholder="Nome" class="input-edit" style="margin-bottom: 5px;">
+        <input type="text" id="imagem" placeholder="Link da Imagem" class="input-edit" style="margin-bottom: 5px;">
+        <input type="number" id="total" value="1" min="1" class="input-edit" style="margin-bottom: 5px;">
+        <button onclick="adicionarPresente()" class="btn-save" style="width:100%; background: var(--cor-verde);">Cadastrar Presente</button>
+      </div>
+
+      <div id="lista-presentes">Carregando...</div>
+    </div>
+
+    <div id="secao-mensagens" class="secao-admin">
+      <h1>Gerenciar Mural</h1>
+      <div id="lista-mensagens">Carregando...</div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // --- LÓGICA DE NAVEGAÇÃO ---
+    function verificarSenha() {
+      if (document.getElementById("senhaInput").value === "1234") {
+        document.getElementById("bloqueio").style.display = "none";
+        document.getElementById("menu-inicial").style.display = "flex";
+      } else { alert("Senha incorreta!"); }
     }
-  }
 
-  var firebaseConfig = {
-    apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
-    authDomain: "lista-casamento-f19c4.firebaseapp.com",
-    projectId: "lista-casamento-f19c4"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  var db = firebase.firestore();
-
-  function adicionarPresente() {
-    var nome = document.getElementById("nome").value;
-    var imagem = document.getElementById("imagem").value;
-    var total = parseInt(document.getElementById("total").value);
-
-    if (!nome || !imagem) { alert("Preencha Nome e Imagem!"); return; }
-
-    db.collection("presentes").add({
-      nome: nome, imagem: imagem, total: total, recebidos: 0
-    }).then(() => {
-      alert("Adicionado com sucesso!");
-      document.getElementById("nome").value = "";
-      document.getElementById("imagem").value = "";
-    });
-  }
-
-  db.collection("presentes").onSnapshot((snapshot) => {
-    var listaDiv = document.getElementById("lista-itens-admin");
-    listaDiv.innerHTML = "";
-
-    snapshot.forEach((doc) => {
-      var p = doc.data();
-      var id = doc.id;
-
-      var item = document.createElement("div");
-      item.className = "item-admin";
-      item.innerHTML = `
-        <div class="item-header">
-          <img src="${p.imagem}" alt="Preview">
-          <div style="flex-grow:1">
-            <label>Nome do Presente:</label>
-            <input type="text" id="nome-${id}" value="${p.nome}" class="input-edit">
-          </div>
-        </div>
-        
-        <div class="row">
-          <div class="col" style="flex-[2]">
-            <label>Link da Imagem:</label>
-            <input type="text" id="img-${id}" value="${p.imagem}" class="input-edit">
-          </div>
-          <div class="col" style="width:80px">
-            <label>Total:</label>
-            <input type="number" id="total-${id}" value="${p.total}" class="input-edit">
-          </div>
-          <div class="col" style="width:80px">
-            <label>Recebidos:</label>
-            <input type="number" id="rec-${id}" value="${p.recebidos}" class="input-edit">
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <button class="btn-save-all" style="flex-grow:1" onclick="salvarAlteracoes('${id}')">Salvar Alterações</button>
-          <button class="btn-excluir" onclick="excluirItem('${id}')">Excluir</button>
-        </div>
-      `;
-      listaDiv.appendChild(item);
-    });
-  });
-
-  function salvarAlteracoes(id) {
-    var novoNome = document.getElementById("nome-" + id).value;
-    var novaImg = document.getElementById("img-" + id).value;
-    var novoTotal = parseInt(document.getElementById("total-" + id).value);
-    var novosRec = parseInt(document.getElementById("rec-" + id).value);
-
-    db.collection("presentes").doc(id).update({
-      nome: novoNome,
-      imagem: novaImg,
-      total: novoTotal,
-      recebidos: novosRec
-    }).then(() => {
-      alert("Alterações salvas para: " + novoNome);
-    }).catch((err) => {
-      alert("Erro ao salvar!");
-      console.error(err);
-    });
-  }
-
-  function excluirItem(id) {
-    if (confirm("Deseja mesmo remover este presente da lista?")) {
-      db.collection("presentes").doc(id).delete();
+    function mostrarSecao(tipo) {
+      document.getElementById("menu-inicial").style.display = "none";
+      document.querySelectorAll('.secao-admin').forEach(s => s.style.display = "none");
+      document.getElementById("secao-" + tipo).style.display = "block";
     }
-  }
-</script>
 
+    function voltarAoMenu() {
+      document.getElementById("menu-inicial").style.display = "flex";
+      document.querySelectorAll('.secao-admin').forEach(s => s.style.display = "none");
+    }
+
+    // --- CONFIGURAÇÃO FIREBASE ---
+    var firebaseConfig = {
+      apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
+      authDomain: "lista-casamento-f19c4.firebaseapp.com",
+      projectId: "lista-casamento-f19c4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+
+    // --- FUNÇÕES DE PRESENTES ---
+    function adicionarPresente() {
+      var n = document.getElementById("nome").value, i = document.getElementById("imagem").value, t = parseInt(document.getElementById("total").value);
+      if (!n || !i) return alert("Preencha tudo!");
+      db.collection("presentes").add({ nome: n, imagem: i, total: t, recebidos: 0 }).then(() => {
+        alert("Adicionado!");
+        document.getElementById("nome").value = ""; document.getElementById("imagem").value = "";
+      });
+    }
+
+    db.collection("presentes").onSnapshot(snap => {
+      var div = document.getElementById("lista-presentes");
+      div.innerHTML = "";
+      snap.forEach(doc => {
+        var p = doc.data(), id = doc.id;
+        var item = document.createElement("div");
+        item.className = "item-admin";
+        item.innerHTML = `
+          <div class="item-header"><img src="${p.imagem}"><strong>${p.nome}</strong></div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:10px;">
+            <label>Total: <input type="number" id="t-${id}" value="${p.total}" class="input-edit"></label>
+            <label>Rec: <input type="number" id="r-${id}" value="${p.recebidos}" class="input-edit"></label>
+          </div>
+          <input type="text" id="i-${id}" value="${p.imagem}" class="input-edit" style="margin-bottom:10px;">
+          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar</button>
+          <button class="btn-del" style="width:25%" onclick="excluirP('${id}')">X</button>`;
+        div.appendChild(item);
+      });
+    });
+
+    function salvarP(id) {
+      db.collection("presentes").doc(id).update({
+        total: parseInt(document.getElementById("t-"+id).value),
+        recebidos: parseInt(document.getElementById("r-"+id).value),
+        imagem: document.getElementById("i-"+id).value
+      }).then(() => alert("Salvo!"));
+    }
+
+    function excluirP(id) { if(confirm("Excluir presente?")) db.collection("presentes").doc(id).delete(); }
+
+    // --- FUNÇÕES DE MENSAGENS ---
+    db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(snap => {
+      var div = document.getElementById("lista-mensagens");
+      div.innerHTML = "";
+      snap.forEach(doc => {
+        var m = doc.data(), id = doc.id;
+        var card = document.createElement("div");
+        card.className = "msg-card";
+        card.innerHTML = `
+          <div style="flex-grow:1"><strong>${m.nome}:</strong><br>
+          <input type="text" id="mt-${id}" value="${m.texto}" class="input-edit"></div>
+          <button onclick="salvarM('${id}')">💾</button>
+          <button class="btn-del" onclick="excluirM('${id}')">🗑️</button>`;
+        div.appendChild(card);
+      });
+    });
+
+    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Mensagem atualizada!")); }
+    function excluirM(id) { if(confirm("Excluir mensagem?")) db.collection("mensagens").doc(id).delete(); }
+  </script>
 </body>
 </html>
