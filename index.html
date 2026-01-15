@@ -8,118 +8,69 @@
   <style>
     :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-fundo: #f8f9fa; }
     
-    /* Animação de Entrada */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Animação do Coração Flutuante */
-    @keyframes floatHeart {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
-    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes floatHeart { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5); opacity: 0; } }
 
     body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 10px; color: #333; overflow-x: hidden; }
-    h1 { text-align: center; color: var(--cor-principal); margin-bottom: 5px; font-size: 1.8rem; }
-    p.subtitulo { text-align: center; margin-bottom: 25px; color: #666; font-size: 0.9rem; }
     
-    .grid-presentes {
-      display: grid;
-      gap: 15px;
-      max-width: 1400px;
-      margin: 0 auto;
+    /* --- CABEÇALHO --- */
+    header { text-align: center; margin-bottom: 30px; }
+    
+    .titulo-lista { font-size: 1.4rem; color: var(--cor-principal); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* Faz os nomes ficarem na mesma linha no celular */
+    .nomes-casal { 
+      font-size: 1.8rem; 
+      color: var(--cor-principal); 
+      margin: 5px 0; 
+      font-weight: 700;
+      white-space: nowrap; /* Impede a quebra de linha */
+      display: block;
     }
 
-    /* Responsividade */
+    .subtitulo { margin: 10px auto; color: #666; font-size: 0.9rem; max-width: 320px; line-height: 1.4; }
+    
+    /* --- GRID --- */
+    .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; }
+
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .nomes-casal { font-size: 1.3rem; } /* Diminui a fonte no celular para caber em uma linha */
+      .titulo-lista { font-size: 1rem; }
       h3 { font-size: 0.85rem !important; }
       .status-text { font-size: 0.7rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
-    @media (min-width: 601px) and (max-width: 1024px) {
-      .grid-presentes { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (min-width: 1025px) {
-      .grid-presentes { grid-template-columns: repeat(6, 1fr); }
-    }
+    @media (min-width: 601px) and (max-width: 1024px) { .grid-presentes { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
-    .card {
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      animation: fadeInUp 0.6s ease backwards; /* Animação de entrada */
-    }
-
-    .card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
-    }
-
-    .card-img-container {
-      width: 100%;
-      padding-top: 100%;
-      position: relative;
-      background: #f4f4f4;
-      overflow: hidden;
-    }
-    
-    .card img {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-    }
-
+    /* --- CARDS --- */
+    .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); animation: fadeInUp 0.6s ease backwards; }
+    .card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.12); }
+    .card-img-container { width: 100%; padding-top: 100%; position: relative; background: #f4f4f4; overflow: hidden; }
+    .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
     .card:hover img { transform: scale(1.1); }
     
     .card-info { padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; text-align: center; }
-    
     h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
     .status-text { font-size: 0.8rem; color: #777; margin-bottom: 2px; }
     
     .progress-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; width: 90%; margin: 0 auto; }
     .progress-bar-fill { height: 100%; background: var(--cor-verde); transition: width 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
 
-    .btn-presentear {
-      background: var(--cor-principal);
-      color: white;
-      border: none;
-      padding: 10px;
-      width: 100%;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-top: 5px;
-      transition: background 0.3s;
-    }
-
-    .btn-presentear:active { transform: scale(0.95); }
+    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-top: 5px; transition: background 0.3s; }
     .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
     
-    /* Coração animado via JS */
-    .heart-animation {
-      position: fixed;
-      font-size: 2rem;
-      color: #e74c3c;
-      pointer-events: none;
-      z-index: 10000;
-      animation: floatHeart 2.5s linear forwards;
-    }
+    .heart-animation { position: fixed; font-size: 2rem; color: #e74c3c; pointer-events: none; z-index: 10000; animation: floatHeart 2.5s linear forwards; }
   </style>
 </head>
 <body>
 
-  <h1>Nossa Lista de Casamento 
-    Patricia e Luiz Henrique 💍</h1>
-  <p class="subtitulo">Toque no item que deseja nos presentear, apenas para evitar presentes repetidos ❤️</p>
+  <header>
+    <h1 class="titulo-lista">Nossa Lista de Casamento</h1>
+    <span class="nomes-casal">Patricia e Luiz Henrique 💍</span>
+    <p class="subtitulo">Toque no item que deseja nos presentear, apenas para evitar presentes repetidos ❤️</p>
+  </header>
 
   <div class="grid-presentes" id="lista"></div>
 
@@ -151,7 +102,7 @@
 
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
-        card.style.animationDelay = delay + "s"; // Efeito de entrada em cascata
+        card.style.animationDelay = delay + "s";
         delay += 0.05;
 
         card.innerHTML = 
@@ -171,11 +122,10 @@
 
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
-        chuvaDeCoracoes(); // Dispara animação
+        chuvaDeCoracoes();
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
         }).then(function() { 
-          // Aguarda um pouco a animação antes do alert
           setTimeout(() => { alert("Muito obrigado! ❤️"); }, 500);
         });
       }
