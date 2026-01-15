@@ -23,7 +23,7 @@
       color: var(--cor-principal); 
       margin: 5px 0; 
       font-weight: 700;
-      white-space: nowrap; /* Nomes na mesma linha no celular */
+      white-space: nowrap; 
       display: block;
     }
     .subtitulo { margin: 10px auto; color: #666; font-size: 0.9rem; max-width: 350px; line-height: 1.4; }
@@ -31,7 +31,6 @@
     /* --- GRID DE PRESENTES --- */
     .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 0 15px; }
 
-    /* Celular: 2 colunas */
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .nomes-casal { font-size: 1.3rem; }
@@ -39,9 +38,7 @@
       .status-text { font-size: 0.7rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
-    /* Tablet */
     @media (min-width: 601px) and (max-width: 1024px) { .grid-presentes { grid-template-columns: repeat(3, 1fr); } }
-    /* Computador: 6 colunas */
     @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
     /* --- CARDS --- */
@@ -62,7 +59,7 @@
     .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-top: 5px; transition: 0.3s; }
     .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
     
-    /* --- MURAL LATERAL (ESTILO SPOTIFY/MARQUEE) --- */
+    /* --- MURAL LATERAL --- */
     .mural-wrapper {
       margin: 60px 0;
       position: relative;
@@ -73,7 +70,6 @@
       overflow: hidden;
     }
 
-    /* Efeito de Degradê nas pontas */
     .mural-wrapper::before, .mural-wrapper::after {
       content: "";
       position: absolute;
@@ -88,7 +84,7 @@
     .marquee-content {
       display: flex;
       width: max-content;
-      animation: scrollLateral 40s linear infinite;
+      animation: scrollLateral 25s linear infinite; /* VELOCIDADE AJUSTADA (de 40s para 25s) */
     }
 
     .msg-item {
@@ -154,19 +150,15 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
-    // --- CARREGAR PRESENTES ---
     db.collection("presentes").onSnapshot(function(snapshot) {
       var listaDiv = document.getElementById("lista");
       listaDiv.innerHTML = "";
       var delay = 0;
-
       snapshot.forEach(function(doc) {
-        var p = doc.data();
-        var id = doc.id;
-        var total = p.total || 1;
-        var recebidos = p.recebidos || 0;
-        var esgotado = recebidos >= total;
+        var p = doc.data(), id = doc.id;
+        var total = p.total || 1, recebidos = p.recebidos || 0;
         var porcentagem = Math.min((recebidos / total) * 100, 100);
+        var esgotado = recebidos >= total;
 
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
@@ -183,30 +175,21 @@
               (esgotado ? "Esgotado" : "Escolher") +
             '</button>' +
           '</div>';
-
         listaDiv.appendChild(card);
       });
     });
 
-    // --- CARREGAR MURAL LATERAL ---
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(function(snapshot) {
       var track = document.getElementById("mural-track");
-      if (snapshot.empty) {
-        track.innerHTML = '<div class="msg-item"><span class="msg-text">"Deixe a primeira mensagem carinhosa!"</span></div>';
-        return;
-      }
-      
+      if (snapshot.empty) return;
       var content = "";
       snapshot.forEach(doc => {
         var m = doc.data();
         content += '<div class="msg-item"><span class="msg-text">"' + m.texto + '"</span><span class="msg-author">— ' + m.nome + '</span></div>';
       });
-
-      // Duplicamos o conteúdo para loop infinito sem falhas
       track.innerHTML = content + content;
     });
 
-    // --- CONFIRMAR ESCOLHA ---
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
         var nomeConvidado = prompt("Qual o seu nome?");
@@ -229,7 +212,7 @@
     }
 
     function chuvaDeCoracoes() {
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 25; i++) { // QUANTIDADE AJUSTADA (de 15 para 25)
         var heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.className = 'heart-animation';
