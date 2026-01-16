@@ -16,7 +16,7 @@
     body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 0; color: #333; overflow-x: hidden; }
     
     /* --- CABEÇALHO --- */
-    header { text-align: center; margin-bottom: 30px; padding: 0 10px; }
+    header { text-align: center; margin-bottom: 30px; padding: 0 15px; }
     .titulo-lista { font-size: 1.1rem; color: var(--cor-principal); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .nomes-casal { 
       font-size: 1.8rem; 
@@ -26,22 +26,29 @@
       white-space: nowrap; 
       display: block;
     }
-    .subtitulo { margin: 10px auto; color: #666; font-size: 0.9rem; max-width: 350px; line-height: 1.4; }
+    .subtitulo { 
+      margin: 15px auto; 
+      color: #666; 
+      font-size: 0.95rem; 
+      max-width: 700px; /* Largura aumentada para o novo texto longo */
+      line-height: 1.6; 
+    }
     
     /* --- GRID DE PRESENTES --- */
     .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 0 15px; }
 
-    /* Responsividade: Celular (2 colunas) | PC (6 colunas) */
+    /* Responsividade: 2 colunas Celular | 6 colunas PC */
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .nomes-casal { font-size: 1.3rem; }
+      .subtitulo { font-size: 0.85rem; }
       h3 { font-size: 0.85rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
     @media (min-width: 601px) and (max-width: 1024px) { .grid-presentes { grid-template-columns: repeat(3, 1fr); } }
     @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
-    /* --- CARDS LIMPOS --- */
+    /* --- CARDS --- */
     .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: all 0.3s ease; animation: fadeInUp 0.6s ease backwards; }
     .card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
@@ -99,7 +106,7 @@
   <header>
     <h1 class="titulo-lista">Nossa Lista de Casamento</h1>
     <span class="nomes-casal">Patricia e Luiz Henrique 💍</span>
-    <p class="subtitulo">Toque no item que deseja nos presentear para evitar presentes repetidos ❤️</p>
+    <p class="subtitulo">O maior presente é a sua presença no nosso grande dia. Mas, se desejar nos presentear, criamos esta lista com itens escolhidos com amor para o nosso novo lar. Fique à vontade para escolher qualquer um dos itens ou, se preferir, nos presentear com algo de sua escolha, que será recebido com o mesmo carinho e gratidão.</p>
   </header>
 
   <div class="grid-presentes" id="lista"></div>
@@ -153,7 +160,6 @@
         card.style.animationDelay = delay + "s";
         delay += 0.05;
 
-        // Visual limpo: apenas imagem, título e botão
         card.innerHTML = 
           '<div class="card-img-container"><img src="' + p.imagem + '"></div>' +
           '<div class="card-info">' +
