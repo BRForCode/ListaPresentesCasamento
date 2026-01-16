@@ -31,17 +31,17 @@
     /* --- GRID DE PRESENTES --- */
     .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 0 15px; }
 
+    /* Responsividade: Celular (2 colunas) | PC (6 colunas) */
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .nomes-casal { font-size: 1.3rem; }
       h3 { font-size: 0.85rem !important; }
-      .status-text { font-size: 0.7rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
     @media (min-width: 601px) and (max-width: 1024px) { .grid-presentes { grid-template-columns: repeat(3, 1fr); } }
     @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
-    /* --- CARDS --- */
+    /* --- CARDS LIMPOS --- */
     .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: all 0.3s ease; animation: fadeInUp 0.6s ease backwards; }
     .card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
@@ -49,17 +49,13 @@
     .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
     .card:hover img { transform: scale(1.1); }
     
-    .card-info { padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; text-align: center; }
-    h3 { margin: 0; font-size: 0.95rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
-    .status-text { font-size: 0.75rem; color: #777; }
-    
-    .progress-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; width: 90%; margin: 2px auto; }
-    .progress-bar-fill { height: 100%; background: var(--cor-verde); transition: width 1s ease; }
+    .card-info { padding: 15px 10px; display: flex; flex-direction: column; gap: 10px; text-align: center; }
+    h3 { margin: 0; font-size: 0.95rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
 
-    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-top: 5px; transition: 0.3s; }
+    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
     .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
     
-    /* --- MURAL LATERAL --- */
+    /* --- MURAL LATERAL ANIMADO --- */
     .mural-wrapper {
       margin: 60px 0;
       position: relative;
@@ -87,14 +83,7 @@
       animation: scrollLateral 25s linear infinite; 
     }
 
-    .msg-item {
-      padding: 0 50px;
-      white-space: nowrap;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
+    .msg-item { padding: 0 50px; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
     .msg-text { font-style: italic; font-size: 1.1rem; color: #555; }
 
     /* --- RODAPÉ --- */
@@ -110,10 +99,7 @@
   <header>
     <h1 class="titulo-lista">Nossa Lista de Casamento</h1>
     <span class="nomes-casal">Patricia e Luiz Henrique 💍</span>
-    <p class="subtitulo">O maior presente é a sua presença no nosso grande dia. 
-      Mas, se desejar nos presentear, criamos esta lista com itens escolhidos com amor para o nosso novo lar. 
-      Fique à vontade para escolher qualquer um dos itens ou, se preferir, 
-      nos presentear com algo de sua escolha, que será recebido com o mesmo carinho e gratidão ❤️</p>
+    <p class="subtitulo">Toque no item que deseja nos presentear para evitar presentes repetidos ❤️</p>
   </header>
 
   <div class="grid-presentes" id="lista"></div>
@@ -152,6 +138,7 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
+    // --- CARREGAR PRESENTES ---
     db.collection("presentes").onSnapshot(function(snapshot) {
       var listaDiv = document.getElementById("lista");
       listaDiv.innerHTML = "";
@@ -159,7 +146,6 @@
       snapshot.forEach(function(doc) {
         var p = doc.data(), id = doc.id;
         var total = p.total || 1, recebidos = p.recebidos || 0;
-        var porcentagem = Math.min((recebidos / total) * 100, 100);
         var esgotado = recebidos >= total;
 
         var card = document.createElement("div");
@@ -167,11 +153,10 @@
         card.style.animationDelay = delay + "s";
         delay += 0.05;
 
+        // Visual limpo: apenas imagem, título e botão
         card.innerHTML = 
           '<div class="card-img-container"><img src="' + p.imagem + '"></div>' +
           '<div class="card-info">' +
-            '<div class="status-text">Recebidos: ' + recebidos + ' de ' + total + '</div>' +
-            '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ' + porcentagem + '%"></div></div>' +
             '<h3>' + p.nome + '</h3>' +
             '<button class="btn-presentear" ' + (esgotado ? "disabled" : "") + ' onclick="confirmar(\'' + id + '\')">' +
               (esgotado ? "Esgotado" : "Escolher") +
@@ -181,6 +166,7 @@
       });
     });
 
+    // --- CARREGAR MURAL LATERAL ---
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(function(snapshot) {
       var track = document.getElementById("mural-track");
       if (snapshot.empty) return;
@@ -192,6 +178,7 @@
       track.innerHTML = content + content;
     });
 
+    // --- CONFIRMAR ESCOLHA ---
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
         var msgConvidado = prompt("Deixe uma mensagem curta para os noivos:");
