@@ -18,26 +18,12 @@
     /* --- CABEÇALHO --- */
     header { text-align: center; margin-bottom: 30px; padding: 0 15px; }
     .titulo-lista { font-size: 1.1rem; color: var(--cor-principal); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    .nomes-casal { 
-      font-size: 1.8rem; 
-      color: var(--cor-principal); 
-      margin: 5px 0; 
-      font-weight: 700;
-      white-space: nowrap; 
-      display: block;
-    }
-    .subtitulo { 
-      margin: 15px auto; 
-      color: #666; 
-      font-size: 0.95rem; 
-      max-width: 700px; /* Largura aumentada para o novo texto longo */
-      line-height: 1.6; 
-    }
+    .nomes-casal { font-size: 1.8rem; color: var(--cor-principal); margin: 5px 0; font-weight: 700; white-space: nowrap; display: block; }
+    .subtitulo { margin: 15px auto; color: #666; font-size: 0.95rem; max-width: 700px; line-height: 1.6; }
     
     /* --- GRID DE PRESENTES --- */
     .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 0 15px; }
 
-    /* Responsividade: 2 colunas Celular | 6 colunas PC */
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .nomes-casal { font-size: 1.3rem; }
@@ -45,59 +31,32 @@
       h3 { font-size: 0.85rem !important; }
       .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
-    @media (min-width: 601px) and (max-width: 1024px) { .grid-presentes { grid-template-columns: repeat(3, 1fr); } }
     @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
-    /* --- CARDS --- */
-    .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: all 0.3s ease; animation: fadeInUp 0.6s ease backwards; }
-    .card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-
+    .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: 0.3s; animation: fadeInUp 0.6s ease backwards; }
     .card-img-container { width: 100%; padding-top: 100%; position: relative; background: #f4f4f4; overflow: hidden; }
-    .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    .card:hover img { transform: scale(1.1); }
-    
+    .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
     .card-info { padding: 15px 10px; display: flex; flex-direction: column; gap: 10px; text-align: center; }
     h3 { margin: 0; font-size: 0.95rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+    .btn-presentear:disabled { background: #ddd; color: #888; }
 
-    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
-    .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
-    
-    /* --- MURAL LATERAL ANIMADO --- */
-    .mural-wrapper {
-      margin: 60px 0;
-      position: relative;
-      width: 100%;
-      background: white;
-      padding: 30px 0;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-      overflow: hidden;
-    }
+    /* --- SEÇÃO PIX --- */
+    .pix-section { max-width: 500px; margin: 60px auto; text-align: center; padding: 30px 20px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .pix-section h2 { color: var(--cor-principal); font-size: 1.3rem; margin-bottom: 10px; }
+    .pix-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .pix-chave { background: #f9f9f9; padding: 12px; border: 1px dashed var(--cor-principal); border-radius: 8px; font-size: 0.9rem; word-break: break-all; color: #555; }
+    .btn-pix { background: var(--cor-principal); color: white; border: none; padding: 12px; border-radius: 25px; cursor: pointer; font-weight: 700; transition: 0.3s; }
 
-    .mural-wrapper::before, .mural-wrapper::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      width: 150px;
-      height: 100%;
-      z-index: 2;
-    }
-    .mural-wrapper::before { left: 0; background: linear-gradient(to right, var(--cor-fundo), transparent); }
-    .mural-wrapper::after { right: 0; background: linear-gradient(to left, var(--cor-fundo), transparent); }
-
-    .marquee-content {
-      display: flex;
-      width: max-content;
-      animation: scrollLateral 25s linear infinite; 
-    }
-
+    /* --- MURAL LATERAL --- */
+    .mural-wrapper { margin: 40px 0; position: relative; width: 100%; background: white; padding: 30px 0; overflow: hidden; }
+    .mural-wrapper::before { left: 0; position: absolute; top: 0; width: 150px; height: 100%; z-index: 2; content: ""; background: linear-gradient(to right, var(--cor-fundo), transparent); }
+    .mural-wrapper::after { right: 0; position: absolute; top: 0; width: 150px; height: 100%; z-index: 2; content: ""; background: linear-gradient(to left, var(--cor-fundo), transparent); }
+    .marquee-content { display: flex; width: max-content; animation: scrollLateral 25s linear infinite; }
     .msg-item { padding: 0 50px; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
     .msg-text { font-style: italic; font-size: 1.1rem; color: #555; }
 
-    /* --- RODAPÉ --- */
     footer { padding: 40px 20px; background: white; text-align: center; border-top: 1px solid #eee; }
-    .footer-info { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-bottom: 20px; }
-    .footer-info div p { margin: 5px 0; color: #666; font-size: 0.9rem; }
-    
     .heart-animation { position: fixed; font-size: 2rem; color: #e74c3c; pointer-events: none; z-index: 10000; animation: floatHeart 2.5s linear forwards; }
   </style>
 </head>
@@ -106,10 +65,19 @@
   <header>
     <h1 class="titulo-lista">Nossa Lista de Casamento</h1>
     <span class="nomes-casal">Patricia e Luiz Henrique 💍</span>
-    <p class="subtitulo">O maior presente é a sua presença no nosso grande dia. Mas, se desejar nos presentear, criamos esta lista com itens escolhidos com amor para o nosso novo lar. Fique à vontade para escolher qualquer um dos itens ou, se preferir, nos presentear com algo de sua escolha, que será recebido com o mesmo carinho e gratidão ❤️</p>
+    <p class="subtitulo">O maior presente é a sua presença no nosso grande dia. Mas, se desejar nos presentear, criamos esta lista com itens escolhidos com amor para o nosso novo lar. Fique à vontade para escolher qualquer um dos itens ou, se preferir, nos presentear com algo de sua escolha, que será recebido com o mesmo carinho e gratidão. ❤️</p>
   </header>
 
   <div class="grid-presentes" id="lista"></div>
+
+  <div class="pix-section">
+    <h2>Presente em Dinheiro (PIX)</h2>
+    <p style="font-size: 0.85rem; color: #777;">Se preferir nos presentear com qualquer valor via PIX, use a chave abaixo:</p>
+    <div class="pix-container">
+      <div class="pix-chave" id="chave-pix">suachavepixaqui@email.com</div>
+      <button class="btn-pix" onclick="copiarPix()">Copiar Chave PIX</button>
+    </div>
+  </div>
 
   <div class="mural-wrapper">
     <h2 style="text-align: center; color: var(--cor-principal); font-size: 1.2rem; margin-bottom: 20px;">Mensagens de Carinho ❤️</h2>
@@ -119,16 +87,6 @@
   </div>
 
   <footer>
-    <div class="footer-info">
-      <div>
-        <p><strong>Nosso Casamento</strong></p>
-        <p>Prepare o coração para este grande dia!</p>
-      </div>
-      <div>
-        <p><strong>Dúvidas?</strong></p>
-        <p>Fale conosco pelo WhatsApp</p>
-      </div>
-    </div>
     <p style="font-size: 0.8rem; color: #aaa;">© 2026 Patricia & Luiz Henrique</p>
   </footer>
 
@@ -145,62 +103,59 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
-    // --- CARREGAR PRESENTES ---
+    // Carregar Presentes
     db.collection("presentes").onSnapshot(function(snapshot) {
       var listaDiv = document.getElementById("lista");
       listaDiv.innerHTML = "";
-      var delay = 0;
       snapshot.forEach(function(doc) {
         var p = doc.data(), id = doc.id;
-        var total = p.total || 1, recebidos = p.recebidos || 0;
-        var esgotado = recebidos >= total;
-
+        var esgotado = (p.recebidos || 0) >= (p.total || 1);
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
-        card.style.animationDelay = delay + "s";
-        delay += 0.05;
-
-        card.innerHTML = 
-          '<div class="card-img-container"><img src="' + p.imagem + '"></div>' +
-          '<div class="card-info">' +
-            '<h3>' + p.nome + '</h3>' +
-            '<button class="btn-presentear" ' + (esgotado ? "disabled" : "") + ' onclick="confirmar(\'' + id + '\')">' +
-              (esgotado ? "Esgotado" : "Escolher") +
-            '</button>' +
-          '</div>';
+        card.innerHTML = `<div class="card-img-container"><img src="${p.imagem}"></div>
+          <div class="card-info"><h3>${p.nome}</h3>
+          <button class="btn-presentear" ${esgotado ? "disabled" : ""} onclick="confirmar('${id}')">
+          ${esgotado ? "Esgotado" : "Escolher"}</button></div>`;
         listaDiv.appendChild(card);
       });
     });
 
-    // --- CARREGAR MURAL LATERAL ---
+    // Mural
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(function(snapshot) {
       var track = document.getElementById("mural-track");
       if (snapshot.empty) return;
       var content = "";
-      snapshot.forEach(doc => {
-        var m = doc.data();
-        content += '<div class="msg-item"><span class="msg-text">"' + m.texto + '"</span></div>';
-      });
+      snapshot.forEach(doc => { content += <div class="msg-item"><span class="msg-text">"${doc.data().texto}"</span></div>; });
       track.innerHTML = content + content;
     });
 
-    // --- CONFIRMAR ESCOLHA ---
+    // Função PIX
+    function copiarPix() {
+      var chave = document.getElementById("chave-pix").innerText;
+      navigator.clipboard.writeText(chave).then(function() {
+        var btn = document.querySelector(".btn-pix");
+        btn.innerText = "Chave Copiada! ❤️";
+        btn.style.background = "#27ae60";
+        chuvaDeCoracoes();
+        
+        setTimeout(function() {
+          var msg = prompt("Chave copiada! Deseja deixar uma mensagem para os noivos no mural?");
+          if(msg) {
+            db.collection("mensagens").add({ nome: "Convidado", texto: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+          }
+          btn.innerText = "Copiar Chave PIX";
+          btn.style.background = "var(--cor-principal)";
+        }, 800);
+      });
+    }
+
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
-        var msgConvidado = prompt("Deixe uma mensagem curta para os noivos:");
-
-        db.collection("presentes").doc(id).update({
-          recebidos: firebase.firestore.FieldValue.increment(1)
-        }).then(function() {
-          if(msgConvidado) {
-            db.collection("mensagens").add({
-              nome: "Convidado", 
-              texto: msgConvidado,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          }
+        var msg = prompt("Deixe uma mensagem curta para os noivos:");
+        db.collection("presentes").doc(id).update({ recebidos: firebase.firestore.FieldValue.increment(1) }).then(function() {
+          if(msg) db.collection("mensagens").add({ nome: "Convidado", texto: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
           chuvaDeCoracoes();
-          setTimeout(() => { alert("Muito obrigado pelo carinho! ❤️"); }, 500);
+          setTimeout(() => { alert("Muito obrigado! ❤️"); }, 500);
         });
       }
     }
