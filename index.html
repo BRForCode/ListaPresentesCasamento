@@ -84,7 +84,7 @@
     .marquee-content {
       display: flex;
       width: max-content;
-      animation: scrollLateral 10s linear infinite; /* VELOCIDADE AJUSTADA (de 40s para 25s) */
+      animation: scrollLateral 25s linear infinite; 
     }
 
     .msg-item {
@@ -96,7 +96,6 @@
     }
 
     .msg-text { font-style: italic; font-size: 1.1rem; color: #555; }
-    .msg-author { font-weight: 700; color: var(--cor-principal); font-size: 0.9rem; margin-top: 5px; }
 
     /* --- RODAPÉ --- */
     footer { padding: 40px 20px; background: white; text-align: center; border-top: 1px solid #eee; }
@@ -185,22 +184,21 @@
       var content = "";
       snapshot.forEach(doc => {
         var m = doc.data();
-        content += '<div class="msg-item"><span class="msg-text">"' + m.texto + '"</span><span class="msg-author">— ' + m.nome + '</span></div>';
+        content += '<div class="msg-item"><span class="msg-text">"' + m.texto + '"</span></div>';
       });
       track.innerHTML = content + content;
     });
 
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
-        var nomeConvidado = prompt("Qual o seu nome?");
         var msgConvidado = prompt("Deixe uma mensagem curta para os noivos:");
 
         db.collection("presentes").doc(id).update({
           recebidos: firebase.firestore.FieldValue.increment(1)
         }).then(function() {
-          if(nomeConvidado && msgConvidado) {
+          if(msgConvidado) {
             db.collection("mensagens").add({
-              nome: nomeConvidado,
+              nome: "Convidado", 
               texto: msgConvidado,
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -212,7 +210,7 @@
     }
 
     function chuvaDeCoracoes() {
-      for (let i = 0; i < 25; i++) { // QUANTIDADE AJUSTADA (de 15 para 25)
+      for (let i = 0; i < 25; i++) {
         var heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.className = 'heart-animation';
