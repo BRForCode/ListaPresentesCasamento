@@ -6,38 +6,34 @@
   <title>Painel Administrativo - Patricia & Luiz</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-vermelho: #e74c3c; --cor-azul: #3498db; }
+    :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-vermelho: #e74c3c; --cor-azul: #3498db; --cor-roxo: #9b59b6; }
     
     body { font-family: 'Montserrat', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; margin: 0; }
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     h1, h2 { text-align: center; color: var(--cor-principal); }
 
-    /* Telas de Bloqueio e Menu */
     #bloqueio, #menu-inicial { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     #menu-inicial { display: none; z-index: 9998; }
 
     .btn-menu { width: 250px; padding: 20px; margin: 10px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; color: white; }
     .btn-p { background: var(--cor-principal); }
     .btn-m { background: var(--cor-azul); }
+    .btn-pix-menu { background: var(--cor-roxo); }
     .btn-menu:hover { transform: scale(1.05); filter: brightness(1.1); }
 
     .secao-admin { display: none; }
     .btn-voltar { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
 
-    /* Estilos de Presentes */
-    .form-novo { background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc; margin-bottom: 30px; }
-    .input-edit { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    .form-novo, .config-box { background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc; margin-bottom: 30px; }
+    .input-edit { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+    .label-mini { font-size: 10px; color: #999; text-transform: uppercase; font-weight: bold; margin-top: 10px; display: block; }
+    
     .item-admin { border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
     .item-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
     .item-header img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
 
-    /* Estilos de Mensagens */
-    .msg-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .msg-inputs { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; }
-    .label-mini { font-size: 10px; color: #999; text-transform: uppercase; font-weight: bold; }
-    
     button { cursor: pointer; font-weight: 600; transition: 0.2s; }
-    .btn-save { background: var(--cor-azul); color: white; border: none; padding: 10px; border-radius: 5px; }
+    .btn-save { background: var(--cor-azul); color: white; border: none; padding: 12px; border-radius: 5px; }
     .btn-del { background: var(--cor-vermelho); color: white; border: none; padding: 10px; border-radius: 5px; }
   </style>
 </head>
@@ -53,6 +49,7 @@
     <h2>O que deseja alterar?</h2>
     <button class="btn-menu btn-p" onclick="mostrarSecao('presentes')">🎁 Presentes</button>
     <button class="btn-menu btn-m" onclick="mostrarSecao('mensagens')">📝 Mensagens</button>
+    <button class="btn-menu btn-pix-menu" onclick="mostrarSecao('pix')">💸 Chave Pix</button>
   </div>
 
   <div class="container">
@@ -74,13 +71,22 @@
       <h1>Gerenciar Mural</h1>
       <div id="lista-mensagens">Carregando...</div>
     </div>
+
+    <div id="secao-pix" class="secao-admin">
+      <h1>Configurar Chave Pix</h1>
+      <div class="config-box">
+        <p>Esta é a chave que aparecerá para os convidados no site principal.</p>
+        <label class="label-mini">Chave Pix Atual</label>
+        <input type="text" id="inputChavePix" placeholder="Ex: seu-email@gmail.com ou CPF" class="input-edit">
+        <button onclick="salvarPix()" class="btn-save" style="width:100%; margin-top: 15px; background: var(--cor-roxo);">Atualizar Chave Pix</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
-    // --- NAVEGAÇÃO ---
     function verificarSenha() {
       if (document.getElementById("senhaInput").value === "1234") {
         document.getElementById("bloqueio").style.display = "none";
@@ -92,6 +98,7 @@
       document.getElementById("menu-inicial").style.display = "none";
       document.querySelectorAll('.secao-admin').forEach(s => s.style.display = "none");
       document.getElementById("secao-" + tipo).style.display = "block";
+      if(tipo === 'pix') carregarPix();
     }
 
     function voltarAoMenu() {
@@ -99,7 +106,6 @@
       document.querySelectorAll('.secao-admin').forEach(s => s.style.display = "none");
     }
 
-    // --- FIREBASE ---
     var firebaseConfig = {
       apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
       authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -108,7 +114,21 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
-    // --- PRESENTES ---
+    // --- LOGICA PIX ---
+    function carregarPix() {
+      db.collection("config").doc("pix").get().then((doc) => {
+        if (doc.exists) document.getElementById("inputChavePix").value = doc.data().chave;
+      });
+    }
+
+    function salvarPix() {
+      var novaChave = document.getElementById("inputChavePix").value;
+      db.collection("config").doc("pix").set({ chave: novaChave }).then(() => {
+        alert("Chave Pix atualizada com sucesso!");
+      });
+    }
+
+    // --- PRESENTES E MENSAGENS (MANTIDOS) ---
     function adicionarPresente() {
       var n = document.getElementById("nome").value, i = document.getElementById("imagem").value, t = parseInt(document.getElementById("total").value);
       if (!n || !i) return alert("Preencha tudo!");
@@ -132,9 +152,7 @@
             <input type="number" id="t-${id}" value="${p.total}" class="input-edit">
             <input type="number" id="r-${id}" value="${p.recebidos}" class="input-edit">
           </div>
-          <label class="label-mini">URL da Imagem</label>
-          <input type="text" id="i-${id}" value="${p.imagem}" class="input-edit" style="margin-bottom:10px;">
-          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar Alterações</button>
+          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar</button>
           <button class="btn-del" style="width:25%" onclick="excluirP('${id}')">Excluir</button>`;
         div.appendChild(item);
       });
@@ -143,42 +161,32 @@
     function salvarP(id) {
       db.collection("presentes").doc(id).update({
         total: parseInt(document.getElementById("t-"+id).value),
-        recebidos: parseInt(document.getElementById("r-"+id).value),
-        imagem: document.getElementById("i-"+id).value
-      }).then(() => alert("Presente atualizado!"));
+        recebidos: parseInt(document.getElementById("r-"+id).value)
+      }).then(() => alert("Salvo!"));
     }
 
-    function excluirP(id) { if(confirm("Excluir presente?")) db.collection("presentes").doc(id).delete(); }
+    function excluirP(id) { if(confirm("Excluir?")) db.collection("presentes").doc(id).delete(); }
 
-    // --- MENSAGENS (TEXTO APENAS) ---
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(snap => {
       var div = document.getElementById("lista-mensagens");
       div.innerHTML = "";
       snap.forEach(doc => {
         var m = doc.data(), id = doc.id;
         var card = document.createElement("div");
-        card.className = "msg-card";
+        card.className = "item-admin";
         card.innerHTML = `
-          <div class="msg-inputs">
-            <label class="label-mini">Mensagem enviada</label>
-            <input type="text" id="mt-${id}" value="${m.texto}" class="input-edit">
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 5px;">
-            <button class="btn-save" onclick="salvarM('${id}')">💾</button>
-            <button class="btn-del" onclick="excluirM('${id}')">🗑️</button>
+          <label class="label-mini">Mensagem enviada</label>
+          <input type="text" id="mt-${id}" value="${m.texto}" class="input-edit">
+          <div style="margin-top:10px">
+            <button class="btn-save" onclick="salvarM('${id}')">💾 Salvar</button>
+            <button class="btn-del" onclick="excluirM('${id}')">🗑️ Excluir</button>
           </div>`;
         div.appendChild(card);
       });
     });
 
-    function salvarM(id) { 
-      var novoTexto = document.getElementById("mt-"+id).value;
-      db.collection("mensagens").doc(id).update({ 
-        texto: novoTexto 
-      }).then(() => alert("Mensagem atualizada!")); 
-    }
-
-    function excluirM(id) { if(confirm("Excluir mensagem?")) db.collection("mensagens").doc(id).delete(); }
+    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Atualizado!")); }
+    function excluirM(id) { if(confirm("Excluir?")) db.collection("mensagens").doc(id).delete(); }
   </script>
 </body>
 </html>
