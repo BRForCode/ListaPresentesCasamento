@@ -12,7 +12,6 @@
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     h1, h2 { text-align: center; color: var(--cor-principal); }
 
-    /* Telas de Bloqueio e Menu */
     #bloqueio, #menu-inicial { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     #menu-inicial { display: none; z-index: 9998; }
 
@@ -25,10 +24,8 @@
     .secao-admin { display: none; }
     .btn-voltar { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
 
-    /* Estilos de Presentes */
     .form-novo, .config-box { background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc; margin-bottom: 20px; }
     
-    /* ESTILO DO CONTADOR */
     #contador-container {
       background: #fff;
       border: 2px solid var(--cor-principal);
@@ -135,7 +132,6 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
-    // --- LOGICA PIX ---
     function carregarPix() {
       db.collection("config").doc("pix").get().then((doc) => {
         if (doc.exists) document.getElementById("inputChavePix").value = doc.data().chave;
@@ -147,7 +143,6 @@
       db.collection("config").doc("pix").set({ chave: novaChave }).then(() => alert("Pix atualizado!"));
     }
 
-    // --- LOGICA PRESENTES ---
     function adicionarPresente() {
       var n = document.getElementById("nome").value, i = document.getElementById("imagem").value, t = parseInt(document.getElementById("total").value);
       if (!n || !i) return alert("Preencha tudo!");
@@ -168,39 +163,46 @@
       snap.forEach(doc => {
         var p = doc.data(), id = doc.id;
         
-        // Acumula os valores para o contador
         totalGlobal += (p.total || 0);
         recebidosGlobal += (p.recebidos || 0);
 
         var item = document.createElement("div");
         item.className = "item-admin";
         item.innerHTML = `
-          <div class="item-header"><img src="${p.imagem}"><strong>${p.nome}</strong></div>
+          <div class="item-header">
+            <img src="${p.imagem}">
+            <div style="flex-grow:1">
+              <label class="label-mini">Nome do Produto</label>
+              <input type="text" id="n-${id}" value="${p.nome}" class="input-edit">
+            </div>
+          </div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:10px;">
             <label class="label-mini">Total</label><label class="label-mini">Recebidos</label>
             <input type="number" id="t-${id}" value="${p.total}" class="input-edit">
             <input type="number" id="r-${id}" value="${p.recebidos}" class="input-edit">
           </div>
-          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar</button>
+          <label class="label-mini">URL da Imagem</label>
+          <input type="text" id="i-${id}" value="${p.imagem}" class="input-edit" style="margin-bottom:10px;">
+          <button class="btn-save" style="width:70%" onclick="salvarP('${id}')">Salvar Alterações</button>
           <button class="btn-del" style="width:25%" onclick="excluirP('${id}')">Excluir</button>`;
         div.appendChild(item);
       });
 
-      // Atualiza o texto do contador
       let disponiveis = totalGlobal - recebidosGlobal;
       txtContador.innerText = disponiveis + " presentes disponíveis de " + totalGlobal;
     });
 
     function salvarP(id) {
       db.collection("presentes").doc(id).update({
+        nome: document.getElementById("n-"+id).value,
         total: parseInt(document.getElementById("t-"+id).value),
-        recebidos: parseInt(document.getElementById("r-"+id).value)
-      }).then(() => alert("Salvo!"));
+        recebidos: parseInt(document.getElementById("r-"+id).value),
+        imagem: document.getElementById("i-"+id).value
+      }).then(() => alert("Alterações salvas com sucesso!"));
     }
 
     function excluirP(id) { if(confirm("Excluir?")) db.collection("presentes").doc(id).delete(); }
 
-    // --- LOGICA MENSAGENS ---
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(snap => {
       var div = document.getElementById("lista-mensagens");
       div.innerHTML = "";
