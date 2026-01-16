@@ -8,87 +8,68 @@
   <style>
     :root { --cor-principal: #d4af37; --cor-verde: #27ae60; --cor-fundo: #f8f9fa; }
     
-    /* Animações */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes floatHeart { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5); opacity: 0; } }
     @keyframes scrollLateral { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
     body { font-family: 'Montserrat', sans-serif; background-color: var(--cor-fundo); margin: 0; padding: 20px 0; color: #333; overflow-x: hidden; }
-    
-    /* --- CABEÇALHO --- */
     header { text-align: center; margin-bottom: 30px; padding: 0 15px; }
-    .titulo-lista { font-size: 1.1rem; color: var(--cor-principal); margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .nomes-casal { font-size: 1.8rem; color: var(--cor-principal); margin: 5px 0; font-weight: 700; white-space: nowrap; display: block; }
     .subtitulo { margin: 15px auto; color: #666; font-size: 0.95rem; max-width: 700px; line-height: 1.6; }
     
-    /* --- GRID DE PRESENTES --- */
-    .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 0 15px; }
-
+    /* Grid de Presentes */
+    .grid-presentes { display: grid; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 0 15px; min-height: 100px; }
     @media (max-width: 600px) {
       .grid-presentes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .nomes-casal { font-size: 1.3rem; }
-      .subtitulo { font-size: 0.85rem; }
-      h3 { font-size: 0.85rem !important; }
-      .btn-presentear { font-size: 0.8rem !important; padding: 8px !important; }
     }
     @media (min-width: 1025px) { .grid-presentes { grid-template-columns: repeat(6, 1fr); } }
 
-    .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: 0.3s; animation: fadeInUp 0.6s ease backwards; }
-    .card-img-container { width: 100%; padding-top: 100%; position: relative; background: #f4f4f4; overflow: hidden; }
+    .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; animation: fadeInUp 0.6s ease backwards; }
+    .card-img-container { width: 100%; padding-top: 100%; position: relative; background: #f4f4f4; }
     .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-    .card-info { padding: 15px 10px; display: flex; flex-direction: column; gap: 10px; text-align: center; }
-    h3 { margin: 0; font-size: 0.95rem; font-weight: 600; color: #444; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
-    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-    .btn-presentear:disabled { background: #ddd; color: #888; }
+    .card-info { padding: 15px 10px; text-align: center; display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+    h3 { margin: 0; font-size: 0.95rem; font-weight: 600; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
+    .btn-presentear { background: var(--cor-principal); color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; margin-top: auto; }
+    .btn-presentear:disabled { background: #ddd; color: #888; cursor: not-allowed; }
 
-    /* --- SEÇÃO PIX --- */
+    /* Seção Pix */
     .pix-section { max-width: 500px; margin: 60px auto; text-align: center; padding: 30px 20px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .pix-section h2 { color: var(--cor-principal); font-size: 1.3rem; margin-bottom: 10px; }
-    .pix-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    .pix-chave { background: #f9f9f9; padding: 12px; border: 1px dashed var(--cor-principal); border-radius: 8px; font-size: 0.9rem; word-break: break-all; color: #555; }
-    .btn-pix { background: var(--cor-principal); color: white; border: none; padding: 12px; border-radius: 25px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+    .pix-chave { background: #f9f9f9; padding: 12px; border: 1px dashed var(--cor-principal); border-radius: 8px; margin: 15px 0; font-size: 0.9rem; color: #555; }
+    .btn-pix { background: var(--cor-principal); color: white; border: none; padding: 12px; border-radius: 25px; cursor: pointer; font-weight: 700; width: 100%; }
 
-    /* --- MURAL LATERAL --- */
+    /* Mural */
     .mural-wrapper { margin: 40px 0; position: relative; width: 100%; background: white; padding: 30px 0; overflow: hidden; }
-    .mural-wrapper::before { left: 0; position: absolute; top: 0; width: 150px; height: 100%; z-index: 2; content: ""; background: linear-gradient(to right, var(--cor-fundo), transparent); }
-    .mural-wrapper::after { right: 0; position: absolute; top: 0; width: 150px; height: 100%; z-index: 2; content: ""; background: linear-gradient(to left, var(--cor-fundo), transparent); }
     .marquee-content { display: flex; width: max-content; animation: scrollLateral 25s linear infinite; }
-    .msg-item { padding: 0 50px; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
-    .msg-text { font-style: italic; font-size: 1.1rem; color: #555; }
+    .msg-item { padding: 0 50px; white-space: nowrap; font-style: italic; font-size: 1.1rem; color: #555; }
 
-    footer { padding: 40px 20px; background: white; text-align: center; border-top: 1px solid #eee; }
-    .heart-animation { position: fixed; font-size: 2rem; color: #e74c3c; pointer-events: none; z-index: 10000; animation: floatHeart 2.5s linear forwards; }
+    footer { padding: 40px; text-align: center; border-top: 1px solid #eee; background: #fff; }
+    .heart-animation { position: fixed; font-size: 2rem; color: #e74c3c; z-index: 10000; animation: floatHeart 2.5s linear forwards; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1 class="titulo-lista">Nossa Lista de Casamento</h1>
     <span class="nomes-casal">Patricia e Luiz Henrique 💍</span>
     <p class="subtitulo">O maior presente é a sua presença no nosso grande dia. Mas, se desejar nos presentear, criamos esta lista com itens escolhidos com amor para o nosso novo lar. Fique à vontade para escolher qualquer um dos itens ou, se preferir, nos presentear com algo de sua escolha, que será recebido com o mesmo carinho e gratidão. ❤️</p>
   </header>
 
-  <div class="grid-presentes" id="lista"></div>
+  <div class="grid-presentes" id="lista">
+    </div>
 
   <div class="pix-section">
-    <h2>Presente em Dinheiro (PIX)</h2>
-    <p style="font-size: 0.85rem; color: #777;">Se preferir nos presentear com qualquer valor via PIX, use a chave abaixo:</p>
-    <div class="pix-container">
-      <div class="pix-chave" id="chave-pix">suachavepixaqui@email.com</div>
-      <button class="btn-pix" onclick="copiarPix()">Copiar Chave PIX</button>
-    </div>
+    <h2 style="color: var(--cor-principal); font-size: 1.3rem;">Presente em Dinheiro (PIX)</h2>
+    <p style="font-size: 0.85rem; color: #777;">Toque no botão abaixo para copiar nossa chave:</p>
+    <div class="pix-chave" id="chave-pix">Carregando chave...</div>
+    <button class="btn-pix" onclick="copiarPix()">Copiar Chave PIX</button>
   </div>
 
   <div class="mural-wrapper">
     <h2 style="text-align: center; color: var(--cor-principal); font-size: 1.2rem; margin-bottom: 20px;">Mensagens de Carinho ❤️</h2>
-    <div class="marquee-content" id="mural-track">
-      <div class="msg-item"><span class="msg-text">Carregando mensagens...</span></div>
-    </div>
+    <div class="marquee-content" id="mural-track"></div>
   </div>
 
-  <footer>
-    <p style="font-size: 0.8rem; color: #aaa;">© 2026 Patricia & Luiz Henrique</p>
-  </footer>
+  <footer><p>© 2026 Patricia & Luiz Henrique</p></footer>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -99,23 +80,36 @@
       authDomain: "lista-casamento-f19c4.firebaseapp.com",
       projectId: "lista-casamento-f19c4"
     };
-
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
-    // Carregar Presentes
+    // Buscar Chave Pix
+    db.collection("config").doc("pix").onSnapshot(function(doc) {
+      if (doc.exists) document.getElementById("chave-pix").innerText = doc.data().chave;
+    });
+
+    // Carregar Presentes (Visual Limpo)
     db.collection("presentes").onSnapshot(function(snapshot) {
       var listaDiv = document.getElementById("lista");
       listaDiv.innerHTML = "";
       snapshot.forEach(function(doc) {
-        var p = doc.data(), id = doc.id;
+        var p = doc.data();
+        var id = doc.id;
         var esgotado = (p.recebidos || 0) >= (p.total || 1);
+        
         var card = document.createElement("div");
         card.className = "card" + (esgotado ? " esgotado" : "");
-        card.innerHTML = `<div class="card-img-container"><img src="${p.imagem}"></div>
-          <div class="card-info"><h3>${p.nome}</h3>
-          <button class="btn-presentear" ${esgotado ? "disabled" : ""} onclick="confirmar('${id}')">
-          ${esgotado ? "Esgotado" : "Escolher"}</button></div>`;
+        
+        // Usando concatenação simples para evitar erros de sintaxe no navegador
+        card.innerHTML = 
+          '<div class="card-img-container"><img src="' + p.imagem + '"></div>' +
+          '<div class="card-info">' +
+            '<h3>' + p.nome + '</h3>' +
+            '<button class="btn-presentear" ' + (esgotado ? "disabled" : "") + ' onclick="confirmar(\'' + id + '\')">' +
+              (esgotado ? "Esgotado" : "Escolher") +
+            '</button>' +
+          '</div>';
+        
         listaDiv.appendChild(card);
       });
     });
@@ -123,43 +117,38 @@
     // Mural
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(function(snapshot) {
       var track = document.getElementById("mural-track");
-      if (snapshot.empty) return;
       var content = "";
-      snapshot.forEach(doc => { content += <div class="msg-item"><span class="msg-text">"${doc.data().texto}"</span></div>; });
+      snapshot.forEach(function(doc) { 
+        content += '<div class="msg-item">"' + doc.data().texto + '"</div>'; 
+      });
       track.innerHTML = content + content;
     });
 
-    // Função PIX
     function copiarPix() {
       var chave = document.getElementById("chave-pix").innerText;
       navigator.clipboard.writeText(chave).then(function() {
         var btn = document.querySelector(".btn-pix");
-        btn.innerText = "Chave Copiada! ❤️";
-        btn.style.background = "#27ae60";
+        btn.innerText = "Copiado! ❤️";
         chuvaDeCoracoes();
-        
         setTimeout(function() {
-          var msg = prompt("Chave copiada! Deseja deixar uma mensagem para os noivos no mural?");
-          if(msg) {
-            db.collection("mensagens").add({ nome: "Convidado", texto: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-          }
           btn.innerText = "Copiar Chave PIX";
-          btn.style.background = "var(--cor-principal)";
-        }, 800);
+          var msg = prompt("Deseja deixar uma mensagem no mural?");
+          if(msg) db.collection("mensagens").add({ nome: "Convidado", texto: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        }, 1000);
       });
     }
 
     function confirmar(id) {
       if(confirm("Deseja confirmar este presente?")) {
-        var msg = prompt("Deixe uma mensagem curta para os noivos:");
+        var msg = prompt("Deixe uma mensagem curta:");
         db.collection("presentes").doc(id).update({ recebidos: firebase.firestore.FieldValue.increment(1) }).then(function() {
           if(msg) db.collection("mensagens").add({ nome: "Convidado", texto: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
           chuvaDeCoracoes();
-          setTimeout(() => { alert("Muito obrigado! ❤️"); }, 500);
         });
       }
     }
 
+    function lluviaDeCorazones() { /* Mantida para compatibilidade */ }
     function chuvaDeCoracoes() {
       for (let i = 0; i < 25; i++) {
         var heart = document.createElement('div');
@@ -169,7 +158,7 @@
         heart.style.top = '100vh';
         heart.style.animationDelay = Math.random() * 1 + 's';
         document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 3000);
+        setTimeout(function() { heart.remove(); }, 3000);
       }
     }
   </script>
