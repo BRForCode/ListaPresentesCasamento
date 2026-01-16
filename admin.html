@@ -12,6 +12,7 @@
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     h1, h2 { text-align: center; color: var(--cor-principal); }
 
+    /* Telas de Bloqueio e Menu */
     #bloqueio, #menu-inicial { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     #menu-inicial { display: none; z-index: 9998; }
 
@@ -24,7 +25,22 @@
     .secao-admin { display: none; }
     .btn-voltar { background: #666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
 
-    .form-novo, .config-box { background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc; margin-bottom: 30px; }
+    /* Estilos de Presentes */
+    .form-novo, .config-box { background: #fdfaf0; padding: 20px; border-radius: 10px; border: 1px solid #f1e4bc; margin-bottom: 20px; }
+    
+    /* ESTILO DO CONTADOR */
+    #contador-container {
+      background: #fff;
+      border: 2px solid var(--cor-principal);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: var(--cor-principal);
+      font-size: 1.1rem;
+    }
+
     .input-edit { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
     .label-mini { font-size: 10px; color: #999; text-transform: uppercase; font-weight: bold; margin-top: 10px; display: block; }
     
@@ -57,6 +73,7 @@
 
     <div id="secao-presentes" class="secao-admin">
       <h1>Gerenciar Presentes</h1>
+      
       <div class="form-novo">
         <h3>Adicionar Novo Item</h3>
         <input type="text" id="nome" placeholder="Nome" class="input-edit" style="margin-bottom: 5px;">
@@ -64,7 +81,12 @@
         <input type="number" id="total" value="1" min="1" class="input-edit" style="margin-bottom: 5px;">
         <button onclick="adicionarPresente()" class="btn-save" style="width:100%; background: var(--cor-verde);">Cadastrar Presente</button>
       </div>
-      <div id="lista-presentes">Carregando...</div>
+
+      <div id="contador-container">
+        <span id="texto-contador">Calculando presentes...</span>
+      </div>
+
+      <div id="lista-presentes">Carregando itens...</div>
     </div>
 
     <div id="secao-mensagens" class="secao-admin">
@@ -75,9 +97,8 @@
     <div id="secao-pix" class="secao-admin">
       <h1>Configurar Chave Pix</h1>
       <div class="config-box">
-        <p>Esta é a chave que aparecerá para os convidados no site principal.</p>
         <label class="label-mini">Chave Pix Atual</label>
-        <input type="text" id="inputChavePix" placeholder="Ex: seu-email@gmail.com ou CPF" class="input-edit">
+        <input type="text" id="inputChavePix" class="input-edit">
         <button onclick="salvarPix()" class="btn-save" style="width:100%; margin-top: 15px; background: var(--cor-roxo);">Atualizar Chave Pix</button>
       </div>
     </div>
@@ -123,12 +144,10 @@
 
     function salvarPix() {
       var novaChave = document.getElementById("inputChavePix").value;
-      db.collection("config").doc("pix").set({ chave: novaChave }).then(() => {
-        alert("Chave Pix atualizada com sucesso!");
-      });
+      db.collection("config").doc("pix").set({ chave: novaChave }).then(() => alert("Pix atualizado!"));
     }
 
-    // --- PRESENTES E MENSAGENS (MANTIDOS) ---
+    // --- LOGICA PRESENTES ---
     function adicionarPresente() {
       var n = document.getElementById("nome").value, i = document.getElementById("imagem").value, t = parseInt(document.getElementById("total").value);
       if (!n || !i) return alert("Preencha tudo!");
@@ -140,9 +159,19 @@
 
     db.collection("presentes").onSnapshot(snap => {
       var div = document.getElementById("lista-presentes");
+      var txtContador = document.getElementById("texto-contador");
       div.innerHTML = "";
+      
+      let totalGlobal = 0;
+      let recebidosGlobal = 0;
+
       snap.forEach(doc => {
         var p = doc.data(), id = doc.id;
+        
+        // Acumula os valores para o contador
+        totalGlobal += (p.total || 0);
+        recebidosGlobal += (p.recebidos || 0);
+
         var item = document.createElement("div");
         item.className = "item-admin";
         item.innerHTML = `
@@ -156,6 +185,10 @@
           <button class="btn-del" style="width:25%" onclick="excluirP('${id}')">Excluir</button>`;
         div.appendChild(item);
       });
+
+      // Atualiza o texto do contador
+      let disponiveis = totalGlobal - recebidosGlobal;
+      txtContador.innerText = disponiveis + " presentes disponíveis de " + totalGlobal;
     });
 
     function salvarP(id) {
@@ -167,6 +200,7 @@
 
     function excluirP(id) { if(confirm("Excluir?")) db.collection("presentes").doc(id).delete(); }
 
+    // --- LOGICA MENSAGENS ---
     db.collection("mensagens").orderBy("timestamp", "desc").onSnapshot(snap => {
       var div = document.getElementById("lista-mensagens");
       div.innerHTML = "";
@@ -174,8 +208,7 @@
         var m = doc.data(), id = doc.id;
         var card = document.createElement("div");
         card.className = "item-admin";
-        card.innerHTML = `
-          <label class="label-mini">Mensagem enviada</label>
+        card.innerHTML = `<label class="label-mini">Mensagem</label>
           <input type="text" id="mt-${id}" value="${m.texto}" class="input-edit">
           <div style="margin-top:10px">
             <button class="btn-save" onclick="salvarM('${id}')">💾 Salvar</button>
@@ -185,7 +218,7 @@
       });
     });
 
-    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Atualizado!")); }
+    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Mensagem salva!")); }
     function excluirM(id) { if(confirm("Excluir?")) db.collection("mensagens").doc(id).delete(); }
   </script>
 </body>
