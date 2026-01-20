@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Convidados - Patrícia & Luiz</title>
+    <title>Controle de Convidados - Patricia e Luiz Henrique</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --noivo: #2c3e50; --noiva: #e74c3c; --whatsapp: #25D366; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+        body { font-family: Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .dashboard { display: flex; justify-content: space-around; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; }
         .dash-item b { display: block; font-size: 1.4em; color: var(--noivo); }
@@ -28,7 +28,7 @@
 <body>
 
 <div class="container" id="app" style="display:none;">
-    <h2 style="text-align:center;">🤵👰 Gestão de Convidados</h2>
+    <h2 style="text-align:center;">Gestão de Convidados</h2>
     
     <div class="dashboard">
         <div class="dash-item">Total Geral <b id="total-geral">0</b></div>
@@ -36,8 +36,8 @@
     </div>
 
     <div class="nav-buttons">
-        <button class="btn-lado btn-luiz" onclick="filtrarLista('Luiz')">Convidados do Luiz</button>
-        <button class="btn-lado btn-patricia" onclick="filtrarLista('Patricia')">Convidados da Patrícia</button>
+        <button class="btn-lado btn-luiz" id="btn-luiz">Convidados do Luiz</button>
+        <button class="btn-lado btn-patricia" id="btn-patricia">Convidados da Patricia</button>
     </div>
 
     <div id="lista-secao" style="display: none;">
@@ -45,15 +45,15 @@
         <p id="stats-lado" style="font-weight: bold; color: #666;"></p>
 
         <div class="add-box">
-            <h4>+ Convidado de última hora</h4>
+            <h4>+ Adicionar convidado de última hora</h4>
             <div class="input-group">
                 <input type="text" id="novo-nome" placeholder="Nome Completo">
                 <input type="text" id="novo-contato" placeholder="WhatsApp ou Responsável">
-                <button class="btn-save" onclick="salvarNovo()">Adicionar</button>
+                <button class="btn-save" id="btn-add">Adicionar</button>
             </div>
         </div>
 
-        <table style="width: 100%;">
+        <table>
             <thead>
                 <tr>
                     <th>Nome</th>
@@ -70,20 +70,21 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // --- CONFIGURAÇÃO DO FIREBASE ---
+    // Configuração real do Firebase aplicada conforme solicitado
     const firebaseConfig = {
-        apiKey: "SUA_API_KEY",
-        authDomain: "SEU_PROJETO.firebaseapp.com",
-        projectId: "SEU_PROJETO",
-        storageBucket: "SEU_PROJETO.appspot.com",
-        messagingSenderId: "ID_AQUI",
-        appId: "APP_ID_AQUI"
+        apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
+        authDomain: "lista-casamento-f19c4.firebaseapp.com",
+        projectId: "lista-casamento-f19c4",
+        storageBucket: "lista-casamento-f19c4.firebasestorage.app",
+        messagingSenderId: "704126420674",
+        appId: "1:704126420674:web:16b47c759235870ace1d5b"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let ladoAtual = "";
 
+    // Proteção por senha
     const senha = prompt("Acesso restrito. Digite a senha:");
     if (senha === "1306") {
         document.getElementById('app').style.display = 'block';
@@ -93,67 +94,86 @@
         window.location.href = "index.html";
     }
 
-    window.filtrarLista = async (lado) => {
+    async function atualizarDashboard() {
+        try {
+            const snap = await getDocs(collection(db, "convidados"));
+            const todos = snap.docs.map(function(d) { return d.data(); });
+            document.getElementById('total-geral').innerText = todos.length;
+            document.getElementById('conf-geral').innerText = todos.filter(function(c) { return c.confirmado === true; }).length;
+        } catch (e) { console.error(e); }
+    }
+
+    async function filtrarLista(lado) {
         ladoAtual = lado;
         const q = query(collection(db, "convidados"), where("lado", "==", lado));
         const snap = await getDocs(q);
-        const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const lista = snap.docs.map(function(d) {
+            var item = d.data();
+            item.id = d.id;
+            return item;
+        });
 
         document.getElementById('lista-secao').style.display = 'block';
         document.getElementById('titulo-lado').innerText = "Lista: " + lado;
         
-        const confLado = lista.filter(c => c.confirmado === true).length;
-        // O USO DA CRASE ABAIXO CORRIGE O ERRO "Unexpected identifier deste"
-        document.getElementById('stats-lado').innerText = Total deste lado: ${lista.length} | Confirmados: ${confLado};
+        var confLado = lista.filter(function(c) { return c.confirmado === true; }).length;
+        document.getElementById('stats-lado').innerText = "Total deste lado: " + lista.length + " | Confirmados: " + confLado;
 
         renderTable(lista);
         atualizarDashboard();
-    };
+    }
 
     function renderTable(lista) {
         const corpo = document.getElementById('tabela-corpo');
         corpo.innerHTML = "";
-        lista.forEach(c => {
-            const num = (c.telefone || "").replace(/\D/g, '');
-            const msg = encodeURIComponent("Olá, gostaria de confirmar a sua presença no casamento da Patrícia e Luiz Henrique");
-            const contato = num.length >= 10 ? 
-                <a href="https://wa.me/55${num}?text=${msg}" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a> : 
-                <span class="resp-text">👤 Resp: ${c.telefone}</span>;
+        lista.forEach(function(c) {
+            var num = (c.telefone || "").replace(/\D/g, '');
+            var msg = "Olá, gostaria de confirmar a sua presença no casamento da Patricia e Luiz Henrique";
+            var linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(msg);
             
-            corpo.innerHTML += `
-                <tr>
-                    <td>${c.nome}</td>
-                    <td>${contato}</td>
-                    <td>
-                        <button class="btn-status" onclick="mudarStatus('${c.id}', true)">Sim</button>
-                        <button class="btn-status" onclick="mudarStatus('${c.id}', false)">Não</button>
-                        <span>${c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳')}</span>
-                    </td>
-                </tr>`;
+            var contatoHTML = "";
+            if (num.length >= 10) {
+                contatoHTML = '<a href="' + linkWa + '" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>';
+            } else {
+                contatoHTML = '<span class="resp-text">👤 Resp: ' + (c.telefone || "N/A") + '</span>';
+            }
+
+            var statusIcon = c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳');
+            
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + c.nome + '</td>' +
+                           '<td>' + contatoHTML + '</td>' +
+                           '<td>' +
+                               '<button class="btn-sim">Sim</button> ' +
+                               '<button class="btn-nao">Não</button> ' +
+                               '<span>' + statusIcon + '</span>' +
+                           '</td>';
+            
+            tr.querySelector('.btn-sim').onclick = function() { mudarStatus(c.id, true); };
+            tr.querySelector('.btn-nao').onclick = function() { mudarStatus(c.id, false); };
+            corpo.appendChild(tr);
         });
     }
 
-    window.mudarStatus = async (id, status) => {
+    async function mudarStatus(id, status) {
         await updateDoc(doc(db, "convidados", id), { confirmado: status });
         filtrarLista(ladoAtual);
-    };
+    }
 
-    window.salvarNovo = async () => {
-        const nome = document.getElementById('novo-nome').value;
-        const tel = document.getElementById('novo-contato').value;
+    async function salvarNovo() {
+        var nome = document.getElementById('novo-nome').value;
+        var tel = document.getElementById('novo-contato').value;
         if(!nome || !tel) return alert("Preencha tudo!");
-        await addDoc(collection(db, "convidados"), { nome, telefone: tel, lado: ladoAtual, confirmado: null });
+        await addDoc(collection(db, "convidados"), { nome: nome, telefone: tel, lado: ladoAtual, confirmado: null });
         document.getElementById('novo-nome').value = "";
         document.getElementById('novo-contato').value = "";
         filtrarLista(ladoAtual);
-    };
-
-    async function atualizarDashboard() {
-        const snap = await getDocs(collection(db, "convidados"));
-        const todos = snap.docs.map(d => d.data());
-        document.getElementById('total-geral').innerText = todos.length;
-        document.getElementById('conf-geral').innerText = todos.filter(c => c.confirmado === true).length;
     }
+
+    document.getElementById('btn-luiz').onclick = function() { filtrarLista('Luiz'); };
+    document.getElementById('btn-patricia').onclick = function() { filtrarLista('Patricia'); };
+    document.getElementById('btn-add').onclick = salvarNovo;
+
 </script>
 </body>
 </html>
