@@ -6,43 +6,17 @@
     <title>Controle de Convidados - Patrícia & Luiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Estilos mantidos para garantir o layout */
         :root { --noivo: #2c3e50; --noiva: #e74c3c; --whatsapp: #25D366; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        
-        /* Dashboard */
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 8px; text-align: center; }
-        .dash-item { font-weight: bold; font-size: 1.1em; }
-
-        /* Botões de Seleção */
-        .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-lado { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 1em; transition: 0.3s; }
+        .dashboard { display: flex; justify-content: space-around; background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .btn-lado { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; margin: 5px; }
         .btn-luiz { background: var(--noivo); }
         .btn-patricia { background: var(--noiva); }
-        .btn-lado:hover { opacity: 0.8; transform: translateY(-2px); }
-
-        /* Formulário de Adicionar */
-        .add-box { border: 2px dashed #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: none; }
-        .add-box input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-add { background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-
-        /* Tabela */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; }
-        .btn-status { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; }
-        .btn-sim { background: #d4edda; color: #155724; }
-        .btn-nao { background: #f8d7da; color: #721c24; }
-        .btn-wa { background: var(--whatsapp); color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.9em; }
-        
-        .resp-text { color: #666; font-style: italic; font-size: 0.9em; }
-        .status-icon { font-size: 1.2em; margin-left: 10px; }
-
-        @media (max-width: 600px) {
-            .dashboard { grid-template-columns: 1fr; }
-            .add-box input { width: 100%; margin-bottom: 10px; }
-            table { font-size: 14px; }
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+        .btn-wa { background: var(--whatsapp); color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 0.8em; }
     </style>
 </head>
 <body>
@@ -51,31 +25,30 @@
     <h2>👰🤵 Gestão de Convidados</h2>
     
     <div class="dashboard">
-        <div class="dash-item">Total Geral: <span id="total-geral">0</span></div>
-        <div class="dash-item">Confirmados: <span id="conf-geral">0</span></div>
+        <div>Total Geral: <span id="total-geral">0</span></div>
+        <div>Confirmados: <span id="conf-geral">0</span></div>
     </div>
 
-    <div class="nav-buttons">
+    <div style="display: flex;">
         <button class="btn-lado btn-luiz" onclick="filtrarLista('Luiz')">Lista do Luiz</button>
         <button class="btn-lado btn-patricia" onclick="filtrarLista('Patricia')">Lista da Patrícia</button>
     </div>
 
     <div id="lista-secao" style="display: none;">
         <h3 id="titulo-lado">Lista</h3>
-        <div id="stats-lado" style="margin-bottom: 15px; font-weight: bold; color: #555;"></div>
+        <p id="stats-lado"></p>
 
-        <div class="add-box" id="form-add" style="display: block;">
-            <h4>+ Convidado de última hora</h4>
-            <input type="text" id="novo-nome" placeholder="Nome do Convidado">
+        <div style="margin-bottom: 20px;">
+            <input type="text" id="novo-nome" placeholder="Nome">
             <input type="text" id="novo-contato" placeholder="WhatsApp ou Responsável">
-            <button class="btn-add" onclick="salvarNovo()">Adicionar</button>
+            <button onclick="salvarNovo()">Adicionar</button>
         </div>
 
         <table>
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>Contato / Ação</th>
+                    <th>Contato</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -86,9 +59,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-dist.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // --- COLE SUAS CONFIGURAÇÕES DO FIREBASE AQUI ---
+    // --- IMPORTANTE: PREENCHA COM SEUS DADOS DO FIREBASE ---
     const firebaseConfig = {
         apiKey: "SUA_API_KEY",
         authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -98,101 +71,81 @@
         appId: "APP_ID_AQUI"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-    // Segurança Simples
-    const senha = prompt("Digite a senha de acesso:");
-    if(senha === "1306") { // Altere para a senha que desejar
-        document.getElementById('app').style.display = 'block';
-    } else {
-        alert("Acesso negado.");
-        window.location.href = "index.html";
+        // Senha de acesso
+        const senhaAcesso = prompt("Senha de acesso:");
+        if(senhaAcesso === "1306") { 
+            document.getElementById('app').style.display = 'block';
+        } else {
+            alert("Senha incorreta!");
+            window.location.href = "index.html";
+        }
+
+        let currentLado = "";
+
+        window.filtrarLista = async (lado) => {
+            currentLado = lado;
+            const q = query(collection(db, "convidados"), where("lado", "==", lado));
+            const snap = await getDocs(q);
+            const convidados = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            document.getElementById('lista-secao').style.display = 'block';
+            document.getElementById('titulo-lado').innerText = "Convidados de " + lado;
+            
+            const conf = convidados.filter(c => c.confirmado === true).length;
+            document.getElementById('stats-lado').innerText = Total: ${convidados.length} | Confirmados: ${conf};
+
+            const corpo = document.getElementById('tabela-corpo');
+            corpo.innerHTML = "";
+            convidados.forEach(c => {
+                const num = c.telefone.replace(/\D/g, '');
+                const contato = num.length >= 10 ? 
+                    <a href="https://wa.me/55${num}?text=Olá" target="_blank" class="btn-wa">WhatsApp</a> : 
+                    <span>${c.telefone}</span>;
+                
+                corpo.innerHTML += `
+                    <tr>
+                        <td>${c.nome}</td>
+                        <td>${contato}</td>
+                        <td>
+                            <button onclick="mudarStatus('${c.id}', true)">Sim</button>
+                            <button onclick="mudarStatus('${c.id}', false)">Não</button>
+                            <span>${c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳')}</span>
+                        </td>
+                    </tr>`;
+            });
+            atualizarGeral();
+        };
+
+        window.mudarStatus = async (id, status) => {
+            await updateDoc(doc(db, "convidados", id), { confirmado: status });
+            filtrarLista(currentLado);
+        };
+
+        window.salvarNovo = async () => {
+            const nome = document.getElementById('novo-nome').value;
+            const tel = document.getElementById('novo-contato').value;
+            await addDoc(collection(db, "convidados"), { nome, telefone: tel, lado: currentLado, confirmado: null });
+            filtrarLista(currentLado);
+        };
+
+        async function atualizarGeral() {
+            const snap = await getDocs(collection(db, "convidados"));
+            const total = snap.size;
+            const conf = snap.docs.filter(d => d.data().confirmado === true).length;
+            document.getElementById('total-geral').innerText = total;
+            document.getElementById('conf-geral').innerText = conf;
+        }
+
+        atualizarGeral();
+
+    } catch (error) {
+        console.error("Erro ao carregar o Firebase:", error);
+        alert("Erro técnico. Verifique o console (F12).");
     }
-
-    let currentLado = "";
-
-    // Função para buscar dados e atualizar dashboard
-    async function atualizarDashboard() {
-        const snap = await getDocs(collection(db, "convidados"));
-        const todos = snap.docs.map(d => d.data());
-        document.getElementById('total-geral').innerText = todos.length;
-        document.getElementById('conf-geral').innerText = todos.filter(c => c.confirmado === true).length;
-    }
-
-    // Função de Filtro
-    window.filtrarLista = async (lado) => {
-        currentLado = lado;
-        const q = query(collection(db, "convidados"), where("lado", "==", lado));
-        const snap = await getDocs(q);
-        const convidados = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        document.getElementById('lista-secao').style.display = 'block';
-        document.getElementById('titulo-lado').innerText = "Convidados de " + lado;
-        
-        const confirmados = convidados.filter(c => c.confirmado === true).length;
-        document.getElementById('stats-lado').innerText = Total: ${convidados.length} | Confirmados: ${confirmados};
-
-        renderizarTabela(convidados);
-        atualizarDashboard();
-    };
-
-    function renderizarTabela(lista) {
-        const corpo = document.getElementById('tabela-corpo');
-        corpo.innerHTML = "";
-
-        lista.forEach(c => {
-            const apenasNumeros = c.telefone.replace(/\D/g, '');
-            let colunaContato = "";
-
-            if (apenasNumeros.length >= 10) {
-                const msg = encodeURIComponent("Olá, gostaria de confirmar a sua presença no casamento da Patricia e Luiz Henrique");
-                colunaContato = <a href="https://wa.me/55${apenasNumeros}?text=${msg}" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>;
-            } else {
-                colunaContato = <span class="resp-text">👤 Resp: ${c.telefone}</span>;
-            }
-
-            const statusIcon = c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳');
-
-            corpo.innerHTML += `
-                <tr>
-                    <td>${c.nome}</td>
-                    <td>${colunaContato}</td>
-                    <td>
-                        <button class="btn-status btn-sim" onclick="mudarStatus('${c.id}', true)">Sim</button>
-                        <button class="btn-status btn-nao" onclick="mudarStatus('${c.id}', false)">Não</button>
-                        <span class="status-icon">${statusIcon}</span>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    window.mudarStatus = async (id, status) => {
-        const docRef = doc(db, "convidados", id);
-        await updateDoc(docRef, { confirmado: status });
-        filtrarLista(currentLado);
-    };
-
-    window.salvarNovo = async () => {
-        const nome = document.getElementById('novo-nome').value;
-        const contato = document.getElementById('novo-contato').value;
-
-        if(!nome || !contato) return alert("Preencha tudo!");
-
-        await addDoc(collection(db, "convidados"), {
-            nome,
-            telefone: contato,
-            lado: currentLado,
-            confirmado: null
-        });
-
-        document.getElementById('novo-nome').value = "";
-        document.getElementById('novo-contato').value = "";
-        filtrarLista(currentLado);
-    };
-
-    atualizarDashboard();
 </script>
 </body>
 </html>
