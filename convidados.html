@@ -8,134 +8,115 @@
     <style>
         :root {
             --primary: #2c3e50;
-            --accent-noivo: #34495e;
-            --accent-noiva: #e74c3c;
+            --noivo: #34495e;
+            --noiva: #e74c3c;
             --whatsapp: #25D366;
+            --sim: #27ae60;
+            --nao: #c0392b;
+            --pendente: #7f8c8d;
             --bg: #f0f2f5;
         }
 
-        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
-        
-        /* Container Principal */
-        .admin-container { width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box; padding: 10px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        .admin-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
 
-        /* Login Interno */
-        #login-screen { 
-            background: white; padding: 30px 20px; border-radius: 15px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; margin: 50px 15px;
-        }
-        #login-screen input { width: 100%; max-width: 250px; padding: 12px; margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        #login-screen button { background: var(--primary); color: white; border: none; padding: 12px 40px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; max-width: 250px; }
+        /* Login */
+        #login-screen { background: white; padding: 40px 20px; border-radius: 15px; text-align: center; margin: 50px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #login-screen input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        #login-screen button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
 
         /* Cabeçalho */
-        header { background: var(--primary); color: white; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 15px; }
+        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
         header h1 { font-size: 18px; margin: 0; }
-        header small { opacity: 0.8; font-size: 12px; }
 
-        /* Dashboard */
-        .stats-bar { display: flex; gap: 10px; margin-bottom: 15px; }
-        .stat-card { background: white; flex: 1; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; }
-        .stat-card b { display: block; font-size: 20px; color: var(--primary); }
-        .stat-card span { font-size: 11px; color: #666; text-transform: uppercase; }
+        /* Dash e Menu */
+        .stats-bar { display: flex; gap: 8px; margin-bottom: 10px; }
+        .stat-card { background: white; flex: 1; padding: 12px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .stat-card b { display: block; font-size: 18px; color: var(--primary); }
+        .stat-card span { font-size: 10px; color: #666; text-transform: uppercase; }
 
-        /* Menu Principal */
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .menu-card { 
-            background: white; padding: 25px 10px; border-radius: 12px; text-align: center; 
-            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-bottom: 4px solid transparent;
-        }
-        .card-luiz { border-color: var(--accent-noivo); }
-        .card-patricia { border-color: var(--accent-noiva); }
-        .menu-card i { font-size: 30px; margin-bottom: 10px; display: block; color: var(--primary); }
-        .menu-card h3 { margin: 0; font-size: 14px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .menu-card { background: white; padding: 20px 10px; border-radius: 10px; text-align: center; cursor: pointer; border-bottom: 4px solid #ddd; }
+        .card-luiz { border-color: var(--noivo); }
+        .card-patricia { border-color: var(--noiva); }
 
         /* View Lista */
         #view-lista { display: none; background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .view-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .btn-voltar { background: #eee; color: #333; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
-        #titulo-lista { margin: 0; font-size: 16px; flex-grow: 1; }
-
-        /* Ferramentas (Busca e Add) - CORREÇÃO MOBILE */
-        .tools-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        .view-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .btn-voltar { background: #eee; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
         
+        /* Ferramentas */
+        .tools-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .search-box { position: relative; }
-        .search-box i { position: absolute; left: 12px; top: 12px; color: #999; }
-        .search-box input { width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .search-box i { position: absolute; left: 10px; top: 12px; color: #999; }
+        .search-box input { width: 100%; padding: 10px 10px 10px 32px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
-        .add-form { display: flex; flex-direction: column; gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 8px; }
-        .add-form input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .add-form { background: #f9f9f9; padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+        .add-form input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
         .btn-add { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* Tabela Mobile Friendly */
-        .table-container { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; min-width: 400px; }
-        th { text-align: left; padding: 10px; font-size: 12px; color: #999; border-bottom: 1px solid #eee; }
-        td { padding: 12px 10px; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
+        /* Lista Otimizada */
+        .guest-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 10px; }
+        .guest-info { flex: 1; min-width: 0; } /* min-width permite que o texto trunque se necessário */
+        .guest-name { font-weight: bold; font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .guest-contact-area { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
         
-        .btn-status { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; background: white; margin-right: 2px; }
-        .btn-wa { color: var(--whatsapp); text-decoration: none; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+        .btn-wa { color: var(--whatsapp); text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+        .resp-text { color: #888; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
 
-        @media (max-width: 480px) {
-            .stats-bar { flex-direction: row; }
-            .menu-grid { grid-template-columns: 1fr 1fr; }
-            td { padding: 10px 5px; }
-            .btn-status { padding: 6px 10px; font-size: 11px; }
+        /* Botão Único de Status */
+        .btn-toggle-status { 
+            min-width: 85px; padding: 8px 5px; border-radius: 6px; border: none; 
+            color: white; font-size: 11px; font-weight: bold; cursor: pointer;
+            transition: background 0.2s; text-transform: uppercase;
+        }
+        .status-sim { background: var(--sim); }
+        .status-nao { background: var(--nao); }
+        .status-pen { background: var(--pendente); }
+
+        @media (max-width: 380px) {
+            .btn-toggle-status { min-width: 70px; font-size: 10px; }
+            .guest-name { font-size: 13px; }
         }
     </style>
 </head>
 <body>
 
 <div class="admin-container">
-    
     <div id="login-screen">
-        <i class="fas fa-lock" style="font-size: 40px; color: var(--primary);"></i>
+        <i class="fas fa-lock" style="font-size: 30px; color: var(--primary);"></i>
         <h2>Acesso Painel</h2>
-        <input type="password" id="input-senha" placeholder="Digite a senha">
-        <button id="btn-login">Acessar</button>
+        <input type="password" id="input-senha" placeholder="Senha (ex: 1306)">
+        <button id="btn-login">ACESSAR</button>
     </div>
 
     <div id="main-app" style="display:none;">
         <header>
             <h1><i class="fas fa-heart"></i> Painel de Convidados</h1>
-            <small>Casamento Patricia & Luiz Henrique</small>
         </header>
 
         <div id="view-dashboard">
             <div class="stats-bar">
-                <div class="stat-card">
-                    <span>Convidados</span>
-                    <b id="total-geral">0</b>
-                </div>
-                <div class="stat-card">
-                    <span>Confirmados</span>
-                    <b id="conf-geral">0</b>
-                </div>
+                <div class="stat-card"><span>Total</span><b id="total-geral">0</b></div>
+                <div class="stat-card"><span>Confirmados</span><b id="conf-geral">0</b></div>
             </div>
-
             <div class="menu-grid">
-                <div class="menu-card card-luiz" id="menu-luiz">
-                    <i class="fas fa-user-tie"></i>
-                    <h3>Lista Luiz</h3>
-                </div>
-                <div class="menu-card card-patricia" id="menu-patricia">
-                    <i class="fas fa-user-nurse"></i>
-                    <h3>Lista Patricia</h3>
-                </div>
+                <div class="menu-card card-luiz" id="menu-luiz"><i class="fas fa-user-tie"></i><h3>Luiz</h3></div>
+                <div class="menu-card card-patricia" id="menu-patricia"><i class="fas fa-user-nurse"></i><h3>Patricia</h3></div>
             </div>
         </div>
 
         <div id="view-lista">
             <div class="view-header">
-                <button class="btn-voltar" id="btn-voltar"><i class="fas fa-chevron-left"></i></button>
+                <button class="btn-voltar" id="btn-voltar"><i class="fas fa-arrow-left"></i></button>
                 <h3 id="titulo-lista">Lista</h3>
             </div>
 
             <div class="tools-bar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="input-busca" placeholder="Buscar por nome ou telefone...">
+                    <input type="text" id="input-busca" placeholder="Buscar convidado...">
                 </div>
-                
                 <div class="add-form">
                     <input type="text" id="novo-nome" placeholder="Nome">
                     <input type="text" id="novo-contato" placeholder="Tel ou Responsável">
@@ -143,18 +124,7 @@
                 </div>
             </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Contato</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-corpo"></tbody>
-                </table>
-            </div>
+            <div id="lista-corpo"></div>
         </div>
     </div>
 </div>
@@ -163,7 +133,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // Suas credenciais reais
     const firebaseConfig = {
         apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
         authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -178,7 +147,6 @@
     let ladoAtivo = "";
     let baseDados = [];
 
-    // Login Interno
     document.getElementById('btn-login').onclick = function() {
         if(document.getElementById('input-senha').value === "1306") {
             document.getElementById('login-screen').style.display = 'none';
@@ -187,12 +155,11 @@
         } else { alert("Senha incorreta!"); }
     };
 
-    // Navegação
     function abrirAba(lado) {
         ladoAtivo = lado;
         document.getElementById('view-dashboard').style.display = 'none';
         document.getElementById('view-lista').style.display = 'block';
-        document.getElementById('titulo-lista').innerText = "Lista de " + lado;
+        document.getElementById('titulo-lista').innerText = "Convidados de " + lado;
         carregarLista();
     }
 
@@ -205,63 +172,64 @@
     document.getElementById('menu-luiz').onclick = () => abrirAba('Luiz');
     document.getElementById('menu-patricia').onclick = () => abrirAba('Patricia');
 
-    // Funções Firebase
     async function carregarLista() {
         const q = query(collection(db, "convidados"), where("lado", "==", ladoAtivo));
         const snap = await getDocs(q);
-        baseDados = snap.docs.map(d => {
-            var obj = d.data();
-            obj.id = d.id;
-            return obj;
-        });
+        baseDados = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderizar();
     }
 
-    document.getElementById('input-busca').oninput = function() { renderizar(); };
+    document.getElementById('input-busca').oninput = () => renderizar();
 
     function renderizar() {
         const termo = document.getElementById('input-busca').value.toLowerCase();
-        const filtrados = baseDados.filter(c => {
-            return (c.nome || "").toLowerCase().includes(termo) || (c.telefone || "").toLowerCase().includes(termo);
-        });
-
-        const corpo = document.getElementById('tabela-corpo');
+        const filtrados = baseDados.filter(c => (c.nome || "").toLowerCase().includes(termo) || (c.telefone || "").toLowerCase().includes(termo));
+        
+        const corpo = document.getElementById('lista-corpo');
         corpo.innerHTML = "";
         
-        filtrados.forEach(function(c) {
-            var num = (c.telefone || "").replace(/\D/g, '');
-            var textoWa = "Olá, gostaria de confirmar a sua presença no casamento da Patricia e Luiz Henrique";
-            var linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(textoWa);
+        filtrados.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(c => {
+            const num = (c.telefone || "").replace(/\D/g, '');
+            const msg = "Olá, gostaria de confirmar sua presença no casamento da Patricia e Luiz Henrique";
+            const linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(msg);
             
-            var colunaContato = num.length >= 10 ? 
+            let contatoUI = num.length >= 10 ? 
                 '<a href="' + linkWa + '" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>' : 
-                '<span style="color:#999; font-size:12px">👤 ' + c.telefone + '</span>';
+                '<span class="resp-text">👤 ' + c.telefone + '</span>';
 
-            var icone = c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳');
-            
-            var tr = document.createElement('tr');
-            tr.innerHTML = '<td><b>' + c.nome + '</b></td>' +
-                           '<td>' + colunaContato + '</td>' +
-                           '<td style="white-space:nowrap">' +
-                               '<button class="btn-status" id="s-' + c.id + '">Sim</button>' +
-                               '<button class="btn-status" id="n-' + c.id + '">Não</button>' +
-                               '<span>' + icone + '</span>' +
-                           '</td>';
-            
-            corpo.appendChild(tr);
-            document.getElementById('s-' + c.id).onclick = () => mudarStatus(c.id, true);
-            document.getElementById('n-' + c.id).onclick = () => mudarStatus(c.id, false);
+            // Lógica do botão único
+            let btnClass = "status-pen";
+            let btnText = "Pendente";
+            if(c.confirmado === true) { btnClass = "status-sim"; btnText = "Confirmado"; }
+            else if(c.confirmado === false) { btnClass = "status-nao"; btnText = "Não vai"; }
+
+            const div = document.createElement('div');
+            div.className = "guest-row";
+            div.innerHTML = `
+                <div class="guest-info">
+                    <span class="guest-name">${c.nome}</span>
+                    <div class="guest-contact-area">${contatoUI}</div>
+                </div>
+                <button class="btn-toggle-status ${btnClass}" id="btn-${c.id}">${btnText}</button>
+            `;
+            corpo.appendChild(div);
+            document.getElementById("btn-" + c.id).onclick = () => alternarStatus(c.id, c.confirmado);
         });
     }
 
-    async function mudarStatus(id, st) {
-        await updateDoc(doc(db, "convidados", id), { confirmado: st });
+    async function alternarStatus(id, atual) {
+        let novoStatus;
+        if(atual === null || atual === undefined) novoStatus = true; // De pendente para Sim
+        else if(atual === true) novoStatus = false; // De Sim para Não
+        else novoStatus = null; // De Não para Pendente (ciclo)
+
+        await updateDoc(doc(db, "convidados", id), { confirmado: novoStatus });
         carregarLista();
     }
 
     document.getElementById('btn-salvar').onclick = async function() {
-        var n = document.getElementById('novo-nome').value;
-        var t = document.getElementById('novo-contato').value;
+        const n = document.getElementById('novo-nome').value;
+        const t = document.getElementById('novo-contato').value;
         if(!n || !t) return alert("Preencha Nome e Contato");
         await addDoc(collection(db, "convidados"), { nome: n, telefone: t, lado: ladoAtivo, confirmado: null });
         document.getElementById('novo-nome').value = "";
