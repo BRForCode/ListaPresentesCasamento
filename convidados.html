@@ -9,43 +9,20 @@
         :root { --noivo: #2c3e50; --noiva: #e74c3c; --whatsapp: #25D366; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        
-        /* Dashboard de Contadores */
         .dashboard { display: flex; justify-content: space-around; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; }
-        .dash-item { flex: 1; }
         .dash-item b { display: block; font-size: 1.4em; color: var(--noivo); }
-
-        /* Botões de Seleção */
         .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-lado { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 1em; transition: 0.3s; }
+        .btn-lado { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
         .btn-luiz { background: var(--noivo); }
         .btn-patricia { background: var(--noiva); }
-        .btn-lado:hover { opacity: 0.8; }
-
-        /* Cadastro Rápido */
         .add-box { background: #fffdf0; border: 2px dashed #f1c40f; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        .add-box h4 { margin: 0 0 10px 0; color: #856404; }
         .input-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .input-group input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px; }
-        .btn-save { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        /* Tabela */
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 500px; }
+        .input-group input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        .btn-save { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: #666; text-transform: uppercase; font-size: 0.8em; }
-
-        /* Ações */
         .btn-wa { background: var(--whatsapp); color: white; text-decoration: none; padding: 6px 12px; border-radius: 20px; font-size: 0.85em; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-status { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-right: 3px; background: white; transition: 0.2s; }
-        .btn-status:hover { background: #f0f0f0; }
-        .resp-text { color: #7f8c8d; font-style: italic; font-size: 0.9em; }
-        .status-badge { font-size: 1.2em; margin-left: 8px; vertical-align: middle; }
-
-        @media (max-width: 600px) {
-            .nav-buttons { flex-direction: column; }
-            .dashboard { flex-direction: column; gap: 10px; }
-        }
+        .btn-status { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white; }
     </style>
 </head>
 <body>
@@ -65,10 +42,10 @@
 
     <div id="lista-secao" style="display: none;">
         <h3 id="titulo-lado">Lista</h3>
-        <p id="stats-lado" style="font-weight: bold; color: #666; margin-bottom: 15px;"></p>
+        <p id="stats-lado" style="font-weight: bold; color: #666;"></p>
 
         <div class="add-box">
-            <h4>+ Adicionar convidado de última hora</h4>
+            <h4>+ Convidado de última hora</h4>
             <div class="input-group">
                 <input type="text" id="novo-nome" placeholder="Nome Completo">
                 <input type="text" id="novo-contato" placeholder="WhatsApp ou Responsável">
@@ -76,146 +53,107 @@
             </div>
         </div>
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Convidado</th>
-                        <th>Contato / Ação</th>
-                        <th>Confirmação</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-corpo">
-                    </tbody>
-            </table>
-        </div>
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Ação</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-corpo"></tbody>
+        </table>
     </div>
 </div>
 
 <script type="module">
-    // Importações do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
     // --- CONFIGURAÇÃO DO FIREBASE ---
-    // Substitua os valores abaixo pelos seus dados do console do Firebase
     const firebaseConfig = {
         apiKey: "SUA_API_KEY",
         authDomain: "SEU_PROJETO.firebaseapp.com",
         projectId: "SEU_PROJETO",
         storageBucket: "SEU_PROJETO.appspot.com",
-        messagingSenderId: "SENDER_ID_AQUI",
+        messagingSenderId: "ID_AQUI",
         appId: "APP_ID_AQUI"
     };
 
-    // Inicialização
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // Variável de controle
     let ladoAtual = "";
 
-    // Trava de Segurança
     const senha = prompt("Acesso restrito. Digite a senha:");
     if (senha === "1306") {
         document.getElementById('app').style.display = 'block';
-        atualizarContadoresGerais();
+        atualizarDashboard();
     } else {
         alert("Senha incorreta!");
         window.location.href = "index.html";
     }
 
-    // Função para Filtrar e Mostrar a Lista
     window.filtrarLista = async (lado) => {
         ladoAtual = lado;
         const q = query(collection(db, "convidados"), where("lado", "==", lado));
-        const querySnapshot = await getDocs(q);
-        const lista = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        const snap = await getDocs(q);
+        const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        // UI
         document.getElementById('lista-secao').style.display = 'block';
-        document.getElementById('titulo-lado').innerText = "Lista: Convidados de " + lado;
+        document.getElementById('titulo-lado').innerText = "Lista: " + lado;
         
-        const confirmadosLado = lista.filter(c => c.confirmado === true).length;
-        document.getElementById('stats-lado').innerText = Total deste lado: ${lista.length} | Confirmados: ${confirmadosLado};
+        const confLado = lista.filter(c => c.confirmado === true).length;
+        // O USO DA CRASE ABAIXO CORRIGE O ERRO "Unexpected identifier deste"
+        document.getElementById('stats-lado').innerText = Total deste lado: ${lista.length} | Confirmados: ${confLado};
 
-        renderizarTabela(lista);
-        atualizarContadoresGerais();
+        renderTable(lista);
+        atualizarDashboard();
     };
 
-    // Função para Renderizar a Tabela de Convidados
-    function renderizarTabela(lista) {
+    function renderTable(lista) {
         const corpo = document.getElementById('tabela-corpo');
         corpo.innerHTML = "";
-
-        lista.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(c => {
-            const numLimpo = (c.telefone || "").replace(/\D/g, '');
-            let colunaContato = "";
-
-            if (numLimpo.length >= 10) {
-                const msg = encodeURIComponent(Olá, gostaria de confirmar a sua presença no casamento da Patrícia e do Luiz Henrique!);
-                colunaContato = <a href="https://wa.me/55${numLimpo}?text=${msg}" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>;
-            } else {
-                colunaContato = <span class="resp-text">👤 Resp: ${c.telefone}</span>;
-            }
-
-            const check = c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳');
-
+        lista.forEach(c => {
+            const num = (c.telefone || "").replace(/\D/g, '');
+            const msg = encodeURIComponent("Olá, gostaria de confirmar a sua presença no casamento da Patrícia e Luiz Henrique");
+            const contato = num.length >= 10 ? 
+                <a href="https://wa.me/55${num}?text=${msg}" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a> : 
+                <span class="resp-text">👤 Resp: ${c.telefone}</span>;
+            
             corpo.innerHTML += `
                 <tr>
-                    <td><b>${c.nome}</b></td>
-                    <td>${colunaContato}</td>
+                    <td>${c.nome}</td>
+                    <td>${contato}</td>
                     <td>
                         <button class="btn-status" onclick="mudarStatus('${c.id}', true)">Sim</button>
                         <button class="btn-status" onclick="mudarStatus('${c.id}', false)">Não</button>
-                        <span class="status-badge">${check}</span>
+                        <span>${c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳')}</span>
                     </td>
-                </tr>
-            `;
+                </tr>`;
         });
     }
 
-    // Função para Salvar Status (Sim/Não)
     window.mudarStatus = async (id, status) => {
-        try {
-            const ref = doc(db, "convidados", id);
-            await updateDoc(ref, { confirmado: status });
-            filtrarLista(ladoAtual);
-        } catch (e) {
-            console.error("Erro ao atualizar:", e);
-        }
+        await updateDoc(doc(db, "convidados", id), { confirmado: status });
+        filtrarLista(ladoAtual);
     };
 
-    // Função para Novo Convidado
     window.salvarNovo = async () => {
         const nome = document.getElementById('novo-nome').value;
-        const contato = document.getElementById('novo-contato').value;
-
-        if (!nome || !contato) return alert("Preencha Nome e Contato!");
-
-        try {
-            await addDoc(collection(db, "convidados"), {
-                nome: nome,
-                telefone: contato,
-                lado: ladoAtual,
-                confirmado: null
-            });
-            document.getElementById('novo-nome').value = "";
-            document.getElementById('novo-contato').value = "";
-            filtrarLista(ladoAtual);
-        } catch (e) {
-            alert("Erro ao salvar no banco de dados.");
-        }
+        const tel = document.getElementById('novo-contato').value;
+        if(!nome || !tel) return alert("Preencha tudo!");
+        await addDoc(collection(db, "convidados"), { nome, telefone: tel, lado: ladoAtual, confirmado: null });
+        document.getElementById('novo-nome').value = "";
+        document.getElementById('novo-contato').value = "";
+        filtrarLista(ladoAtual);
     };
 
-    // Função para Atualizar Painel Superior
-    async function atualizarContadoresGerais() {
+    async function atualizarDashboard() {
         const snap = await getDocs(collection(db, "convidados"));
         const todos = snap.docs.map(d => d.data());
         document.getElementById('total-geral').innerText = todos.length;
         document.getElementById('conf-geral').innerText = todos.filter(c => c.confirmado === true).length;
     }
-
 </script>
 </body>
 </html>
