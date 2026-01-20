@@ -3,66 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Convidados - Patricia e Luiz Henrique</title>
+    <title>Gestão de Convidados - Patricia e Luiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --noivo: #2c3e50; --noiva: #e74c3c; --whatsapp: #25D366; --bg: #f4f7f6; }
-        body { font-family: Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .dashboard { display: flex; justify-content: space-around; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; }
-        .dash-item b { display: block; font-size: 1.4em; color: var(--noivo); }
-        .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-lado { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
-        .btn-luiz { background: var(--noivo); }
-        .btn-patricia { background: var(--noiva); }
-        .add-box { background: #fffdf0; border: 2px dashed #f1c40f; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        .input-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .input-group input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
-        .btn-save { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        .btn-wa { background: var(--whatsapp); color: white; text-decoration: none; padding: 6px 12px; border-radius: 20px; font-size: 0.85em; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-status { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white; }
+        :root {
+            --primary: #2c3e50;
+            --accent-noivo: #34495e;
+            --accent-noiva: #e74c3c;
+            --whatsapp: #25D366;
+            --bg: #f8f9fa;
+            --white: #ffffff;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
+        /* Container Principal */
+        .admin-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
+
+        /* Tela de Login Interna */
+        #login-screen { 
+            background: var(--white); padding: 40px; border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; margin: 100px auto;
+        }
+        #login-screen input { width: 80%; padding: 12px; margin: 20px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        #login-screen button { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        /* Dashboard e Cabeçalho */
+        #main-app { display: none; }
+        header { background: var(--primary); color: white; padding: 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        
+        .stats-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card b { display: block; font-size: 24px; color: var(--primary); }
+
+        /* Menu de Seleção */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .menu-card { 
+            background: white; padding: 40px; border-radius: 12px; text-align: center; 
+            cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 5px solid transparent;
+        }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .card-luiz { border-color: var(--accent-noivo); }
+        .card-patricia { border-color: var(--accent-noiva); }
+        .menu-card i { font-size: 40px; margin-bottom: 15px; display: block; }
+
+        /* Aba de Lista (View) */
+        #view-lista { display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .btn-voltar { background: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+
+        /* Busca e Adicionar */
+        .tools-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-box { flex: 2; position: relative; }
+        .search-box input { width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .search-box i { position: absolute; left: 12px; top: 13px; color: #999; }
+        
+        .add-form { flex: 3; display: flex; gap: 5px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+        .add-form input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; }
+        .btn-add { background: var(--whatsapp); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+
+        /* Tabela Estilizada */
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; color: #666; font-size: 13px; }
+        td { padding: 15px 12px; border-bottom: 1px solid #f1f1f1; }
+        .btn-status { padding: 6px 12px; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; background: white; font-size: 12px; }
+        .btn-wa { color: var(--whatsapp); text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+
+        @media (max-width: 600px) {
+            .menu-grid, .stats-bar { grid-template-columns: 1fr; }
+            .tools-bar { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="app" style="display:none;">
-    <h2 style="text-align:center;">Gestão de Convidados</h2>
+<div class="admin-container">
     
-    <div class="dashboard">
-        <div class="dash-item">Total Geral <b id="total-geral">0</b></div>
-        <div class="dash-item">Confirmados <b id="conf-geral">0</b></div>
+    <div id="login-screen">
+        <i class="fas fa-lock" style="font-size: 40px; color: var(--primary);"></i>
+        <h2>Acesso Restrito</h2>
+        <input type="password" id="input-senha" placeholder="Digite a senha">
+        <br>
+        <button id="btn-login">Entrar no Painel</button>
     </div>
 
-    <div class="nav-buttons">
-        <button class="btn-lado btn-luiz" id="btn-luiz">Convidados do Luiz</button>
-        <button class="btn-lado btn-patricia" id="btn-patricia">Convidados da Patricia</button>
-    </div>
+    <div id="main-app">
+        <header>
+            <span><i class="fas fa-heart"></i> Painel de Convidados</span>
+            <small>Casamento Patricia & Luiz</small>
+        </header>
 
-    <div id="lista-secao" style="display: none;">
-        <h3 id="titulo-lado">Lista</h3>
-        <p id="stats-lado" style="font-weight: bold; color: #666;"></p>
+        <div id="view-dashboard">
+            <div class="stats-bar">
+                <div class="stat-card">Total de Convidados <b id="total-geral">0</b></div>
+                <div class="stat-card">Confirmados (Sim) <b id="conf-geral">0</b></div>
+            </div>
 
-        <div class="add-box">
-            <h4>+ Adicionar convidado de última hora</h4>
-            <div class="input-group">
-                <input type="text" id="novo-nome" placeholder="Nome Completo">
-                <input type="text" id="novo-contato" placeholder="WhatsApp ou Responsável">
-                <button class="btn-save" id="btn-add">Adicionar</button>
+            <div class="menu-grid">
+                <div class="menu-card card-luiz" id="menu-luiz">
+                    <i class="fas fa-user-tie"></i>
+                    <h3>Convidados do Luiz</h3>
+                    <p>Gerenciar lista do noivo</p>
+                </div>
+                <div class="menu-card card-patricia" id="menu-patricia">
+                    <i class="fas fa-user-nurse"></i>
+                    <h3>Convidados da Patricia</h3>
+                    <p>Gerenciar lista da noiva</p>
+                </div>
             </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Ação</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tabela-corpo"></tbody>
-        </table>
+        <div id="view-lista">
+            <div class="view-header">
+                <button class="btn-voltar" id="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <h3 id="titulo-lista">Lista</h3>
+                <span id="stats-lado" style="color: #666; font-size: 14px;"></span>
+            </div>
+
+            <div class="tools-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="input-busca" placeholder="Buscar por nome ou telefone...">
+                </div>
+                
+                <div class="add-form">
+                    <input type="text" id="novo-nome" placeholder="Nome">
+                    <input type="text" id="novo-contato" placeholder="Tel/Responsável">
+                    <button class="btn-add" id="btn-salvar">Adicionar</button>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Contato</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-corpo"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -70,7 +151,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // Configuração real do Firebase aplicada conforme solicitado
     const firebaseConfig = {
         apiKey: "AIzaSyCTBqA3PVyxQmIvk8k7Ia1HIeGsci_rqdY",
         authDomain: "lista-casamento-f19c4.firebaseapp.com",
@@ -83,44 +163,66 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let ladoAtual = "";
+    let listaCompletaAtiva = [];
 
-    // Proteção por senha
-    const senha = prompt("Acesso restrito. Digite a senha:");
-    if (senha === "1306") {
-        document.getElementById('app').style.display = 'block';
-        atualizarDashboard();
-    } else {
-        alert("Senha incorreta!");
-        window.location.href = "index.html";
-    }
+    // Lógica de Login Interno
+    document.getElementById('btn-login').onclick = function() {
+        const senha = document.getElementById('input-senha').value;
+        if(senha === "1306") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            atualizarDashboard();
+        } else {
+            alert("Senha incorreta!");
+        }
+    };
 
-    async function atualizarDashboard() {
-        try {
-            const snap = await getDocs(collection(db, "convidados"));
-            const todos = snap.docs.map(function(d) { return d.data(); });
-            document.getElementById('total-geral').innerText = todos.length;
-            document.getElementById('conf-geral').innerText = todos.filter(function(c) { return c.confirmado === true; }).length;
-        } catch (e) { console.error(e); }
-    }
-
-    async function filtrarLista(lado) {
+    // Navegação entre abas
+    function abrirLista(lado) {
         ladoAtual = lado;
-        const q = query(collection(db, "convidados"), where("lado", "==", lado));
+        document.getElementById('view-dashboard').style.display = 'none';
+        document.getElementById('view-lista').style.display = 'block';
+        document.getElementById('titulo-lista').innerText = "Convidados de " + lado;
+        carregarListaFirebase();
+    }
+
+    document.getElementById('btn-voltar').onclick = function() {
+        document.getElementById('view-lista').style.display = 'none';
+        document.getElementById('view-dashboard').style.display = 'block';
+        atualizarDashboard();
+    };
+
+    document.getElementById('menu-luiz').onclick = () => abrirLista('Luiz');
+    document.getElementById('menu-patricia').onclick = () => abrirLista('Patricia');
+
+    // Funções de Dados
+    async function carregarListaFirebase() {
+        const q = query(collection(db, "convidados"), where("lado", "==", ladoAtual));
         const snap = await getDocs(q);
-        const lista = snap.docs.map(function(d) {
+        listaCompletaAtiva = snap.docs.map(d => {
             var item = d.data();
             item.id = d.id;
             return item;
         });
+        filtrarERenderizar();
+    }
 
-        document.getElementById('lista-secao').style.display = 'block';
-        document.getElementById('titulo-lado').innerText = "Lista: " + lado;
-        
-        var confLado = lista.filter(function(c) { return c.confirmado === true; }).length;
-        document.getElementById('stats-lado').innerText = "Total deste lado: " + lista.length + " | Confirmados: " + confLado;
+    // Busca Unificada (Nome ou Telefone)
+    document.getElementById('input-busca').oninput = function() {
+        filtrarERenderizar();
+    };
 
-        renderTable(lista);
-        atualizarDashboard();
+    function filtrarERenderizar() {
+        const termo = document.getElementById('input-busca').value.toLowerCase();
+        const filtrados = listaCompletaAtiva.filter(c => {
+            return (c.nome || "").toLowerCase().includes(termo) || 
+                   (c.telefone || "").toLowerCase().includes(termo);
+        });
+
+        const confLado = filtrados.filter(c => c.confirmado === true).length;
+        document.getElementById('stats-lado').innerText = filtrados.length + " pessoas | " + confLado + " confirmadas";
+
+        renderTable(filtrados);
     }
 
     function renderTable(lista) {
@@ -128,51 +230,50 @@
         corpo.innerHTML = "";
         lista.forEach(function(c) {
             var num = (c.telefone || "").replace(/\D/g, '');
-            var msg = "Olá, gostaria de confirmar a sua presença no casamento da Patricia e Luiz Henrique";
-            var linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(msg);
+            var linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent("Olá, gostaria de confirmar a sua presença no casamento da Patricia e Luiz Henrique");
             
-            var contatoHTML = "";
-            if (num.length >= 10) {
-                contatoHTML = '<a href="' + linkWa + '" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>';
-            } else {
-                contatoHTML = '<span class="resp-text">👤 Resp: ' + (c.telefone || "N/A") + '</span>';
-            }
+            var contatoHTML = num.length >= 10 ? 
+                '<a href="' + linkWa + '" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>' : 
+                '<span style="font-size:12px; color:#999">👤 ' + c.telefone + '</span>';
 
             var statusIcon = c.confirmado === true ? '✅' : (c.confirmado === false ? '❌' : '⏳');
             
             var tr = document.createElement('tr');
-            tr.innerHTML = '<td>' + c.nome + '</td>' +
+            tr.innerHTML = '<td><b>' + c.nome + '</b></td>' +
                            '<td>' + contatoHTML + '</td>' +
-                           '<td>' +
-                               '<button class="btn-sim">Sim</button> ' +
-                               '<button class="btn-nao">Não</button> ' +
+                           '<td style="white-space:nowrap">' +
+                               '<button class="btn-status" id="sim-' + c.id + '">Sim</button> ' +
+                               '<button class="btn-status" id="nao-' + c.id + '">Não</button> ' +
                                '<span>' + statusIcon + '</span>' +
                            '</td>';
             
-            tr.querySelector('.btn-sim').onclick = function() { mudarStatus(c.id, true); };
-            tr.querySelector('.btn-nao').onclick = function() { mudarStatus(c.id, false); };
             corpo.appendChild(tr);
+            document.getElementById('sim-' + c.id).onclick = () => mudarStatus(c.id, true);
+            document.getElementById('nao-' + c.id).onclick = () => mudarStatus(c.id, false);
         });
     }
 
     async function mudarStatus(id, status) {
         await updateDoc(doc(db, "convidados", id), { confirmado: status });
-        filtrarLista(ladoAtual);
+        carregarListaFirebase();
     }
 
-    async function salvarNovo() {
+    document.getElementById('btn-salvar').onclick = async function() {
         var nome = document.getElementById('novo-nome').value;
         var tel = document.getElementById('novo-contato').value;
-        if(!nome || !tel) return alert("Preencha tudo!");
-        await addDoc(collection(db, "convidados"), { nome: nome, telefone: tel, lado: ladoAtual, confirmado: null });
+        if(!nome || !tel) return alert("Preencha os campos!");
+        await addDoc(collection(db, "convidados"), { nome, telefone: tel, lado: ladoAtual, confirmado: null });
         document.getElementById('novo-nome').value = "";
         document.getElementById('novo-contato').value = "";
-        filtrarLista(ladoAtual);
-    }
+        carregarListaFirebase();
+    };
 
-    document.getElementById('btn-luiz').onclick = function() { filtrarLista('Luiz'); };
-    document.getElementById('btn-patricia').onclick = function() { filtrarLista('Patricia'); };
-    document.getElementById('btn-add').onclick = salvarNovo;
+    async function atualizarDashboard() {
+        const snap = await getDocs(collection(db, "convidados"));
+        const todos = snap.docs.map(d => d.data());
+        document.getElementById('total-geral').innerText = todos.length;
+        document.getElementById('conf-geral').innerText = todos.filter(c => c.confirmado === true).length;
+    }
 
 </script>
 </body>
