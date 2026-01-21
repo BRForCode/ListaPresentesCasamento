@@ -6,7 +6,17 @@
     <title>Painel de Convidados - Patricia e Luiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2c3e50; --noivo: #34495e; --noiva: #e74c3c; --whatsapp: #27ae60; --bg: #f0f2f5; }
+        :root {
+            --primary: #2c3e50;
+            --noivo: #34495e;
+            --noiva: #e74c3c;
+            --whatsapp: #27ae60;
+            --sim: #27ae60;
+            --nao: #c0392b;
+            --pendente: #7f8c8d;
+            --bg: #f0f2f5;
+        }
+
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         .admin-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
 
@@ -19,11 +29,17 @@
         header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
         header h1 { font-size: 18px; margin: 0; }
 
-        /* Dash e Menu */
+        /* Dashboard Geral */
         .stats-bar { display: flex; gap: 8px; margin-bottom: 10px; }
         .stat-card { background: white; flex: 1; padding: 12px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .stat-card b { display: block; font-size: 18px; color: var(--primary); }
         .stat-card span { font-size: 10px; color: #666; text-transform: uppercase; }
+
+        /* Contadores Específicos (Acima da busca) */
+        .stats-lado-mini { display: flex; gap: 8px; margin-bottom: 15px; }
+        .card-mini { background: #f8f9fa; border: 1px solid #eee; flex: 1; padding: 10px; border-radius: 8px; text-align: center; }
+        .card-mini b { display: block; font-size: 16px; color: var(--primary); }
+        .card-mini span { font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; }
 
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .menu-card { background: white; padding: 20px 10px; border-radius: 10px; text-align: center; cursor: pointer; border-bottom: 4px solid #ddd; }
@@ -44,7 +60,7 @@
         .add-form input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
         .btn-add { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* Lista Familiar */
+        /* Itens da Lista */
         .guest-row { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; gap: 10px; }
         .guest-info { flex: 1; min-width: 0; }
         .guest-name { font-weight: bold; font-size: 14px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -52,7 +68,6 @@
         .limit-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #666; }
         .btn-wa { color: var(--whatsapp); text-decoration: none; font-size: 12px; font-weight: bold; }
 
-        /* Dropdown de Confirmação */
         .select-confirm { 
             padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; 
             font-weight: bold; font-size: 13px; min-width: 100px;
@@ -73,13 +88,13 @@
 
     <div id="main-app" style="display:none;">
         <header>
-            <h1><i class="fas fa-heart"></i> Controle por Família</h1>
+            <h1><i class="fas fa-heart"></i> Controle de Convidados</h1>
         </header>
 
         <div id="view-dashboard">
             <div class="stats-bar">
-                <div class="stat-card"><span>Total Convidados</span><b id="total-geral">0</b></div>
-                <div class="stat-card"><span>Presenças Conf.</span><b id="conf-geral">0</b></div>
+                <div class="stat-card"><span>Total Global</span><b id="total-geral">0</b></div>
+                <div class="stat-card"><span>Presenças Totais</span><b id="conf-geral">0</b></div>
             </div>
             <div class="menu-grid">
                 <div class="menu-card card-luiz" id="menu-luiz"><i class="fas fa-user-tie"></i><h3>Luiz</h3></div>
@@ -93,16 +108,27 @@
                 <h3 id="titulo-lista">Lista</h3>
             </div>
 
+            <div class="stats-lado-mini">
+                <div class="card-mini">
+                    <span>Total Deste Lado</span>
+                    <b id="mini-total-lado">0</b>
+                </div>
+                <div class="card-mini">
+                    <span>Confirmados Aqui</span>
+                    <b id="mini-conf-lado">0</b>
+                </div>
+            </div>
+
             <div class="tools-bar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="input-busca" placeholder="Buscar chefe da casa...">
+                    <input type="text" id="input-busca" placeholder="Buscar convidado...">
                 </div>
                 <div class="add-form">
-                    <input type="text" id="novo-nome" placeholder="Nome do Chefe">
+                    <input type="text" id="novo-nome" placeholder="Nome do Responsável">
                     <input type="text" id="novo-contato" placeholder="WhatsApp ou Resp.">
-                    <input type="number" id="novo-limite" placeholder="Qtd. total de pessoas" min="1" value="1">
-                    <button class="btn-add" id="btn-salvar">Adicionar Família</button>
+                    <input type="number" id="novo-limite" placeholder="Limite de pessoas" min="1" value="1">
+                    <button class="btn-add" id="btn-salvar">Adicionar</button>
                 </div>
             </div>
 
@@ -141,7 +167,7 @@
         ladoAtivo = lado;
         document.getElementById('view-dashboard').style.display = 'none';
         document.getElementById('view-lista').style.display = 'block';
-        document.getElementById('titulo-lista').innerText = "Lista de " + lado;
+        document.getElementById('titulo-lista').innerText = "Convidados de " + lado;
         carregarLista();
     }
 
@@ -167,6 +193,18 @@
         const termo = document.getElementById('input-busca').value.toLowerCase();
         const filtrados = baseDados.filter(c => (c.nome || "").toLowerCase().includes(termo));
         
+        // CÁLCULO DOS CONTADORES DO LADO ATIVO
+        let somaTotalLado = 0;
+        let somaConfLado = 0;
+        
+        filtrados.forEach(c => {
+            somaTotalLado += (c.maxConvidados || 0);
+            if(typeof c.confirmados === 'number') somaConfLado += c.confirmados;
+        });
+        
+        document.getElementById('mini-total-lado').innerText = somaTotalLado;
+        document.getElementById('mini-conf-lado').innerText = somaConfLado;
+
         const corpo = document.getElementById('lista-corpo');
         corpo.innerHTML = "";
         
@@ -179,12 +217,11 @@
                 '<a href="' + linkWa + '" target="_blank" class="btn-wa">WhatsApp</a>' : 
                 '<span class="limit-badge">' + c.telefone + '</span>';
 
-            // Monta o select dinâmico
             let selectHTML = '<select class="select-confirm" id="sel-' + c.id + '">';
             selectHTML += '<option value="0">Pendente</option>';
             for(let i=1; i <= (c.maxConvidados || 1); i++) {
                 let selected = (c.confirmados == i) ? 'selected' : '';
-                selectHTML += '<option value="' + i + '" ' + selected + '>' + i + ' confirmados</option>';
+                selectHTML += '<option value="' + i + '" ' + selected + '>' + i + ' conf.</option>';
             }
             selectHTML += '<option value="recusado" ' + (c.confirmados === "recusado" ? 'selected' : '') + '>Não irá</option>';
             selectHTML += '</select>';
@@ -194,7 +231,7 @@
             div.innerHTML = '<div class="guest-info">' +
                 '<span class="guest-name">' + c.nome + '</span>' +
                 '<div class="guest-details">' +
-                '<span class="limit-badge">Limite: ' + (c.maxConvidados || 1) + '</span>' +
+                '<span class="limit-badge">Capacidade: ' + (c.maxConvidados || 1) + '</span>' +
                 contatoUI + '</div></div>' + selectHTML;
 
             corpo.appendChild(div);
