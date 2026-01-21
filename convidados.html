@@ -83,8 +83,8 @@
 
         <div id="view-dashboard">
             <div class="stats-bar">
-                <div class="stat-card"><span>Total Global</span><b id="total-geral">0</b></div>
-                <div class="stat-card"><span>Presenças Totais</span><b id="conf-geral">0</b></div>
+                <div class="stat-card"><span>Total de Convidados</span><b id="total-geral">0</b></div>
+                <div class="stat-card"><span>Presenças Confirmadas</span><b id="conf-geral">0</b></div>
             </div>
             <div class="menu-grid">
                 <div class="menu-card card-luiz" id="menu-luiz"><i class="fas fa-user-tie"></i><h3>Luiz</h3></div>
@@ -117,7 +117,6 @@
                 <div class="add-form">
                     <input type="text" id="novo-nome" placeholder="Nome do Responsável">
                     <input type="text" id="novo-contato" placeholder="WhatsApp ou Resp.">
-                    
                     <label style="font-size: 10px; color: #666; font-weight: bold;">LIMITE DE PESSOAS:</label>
                     <select id="novo-limite">
                         <option value="1">1 Pessoa</option><option value="2">2 Pessoas</option>
@@ -129,7 +128,6 @@
                         <option value="13">13 Pessoas</option><option value="14">14 Pessoas</option>
                         <option value="15">15 Pessoas</option>
                     </select>
-                    
                     <button class="btn-add" id="btn-salvar">Adicionar</button>
                 </div>
             </div>
@@ -170,10 +168,7 @@
         document.getElementById('view-dashboard').style.display = 'none';
         document.getElementById('view-lista').style.display = 'block';
         document.getElementById('titulo-lista').innerText = "Convidados de " + lado;
-        
-        // Altera a legenda conforme o lado
         document.getElementById('label-total-lado').innerText = "Total de " + lado;
-        
         carregarLista();
     }
 
@@ -215,8 +210,15 @@
         
         filtrados.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(c => {
             const num = (c.telefone || "").replace(/\D/g, '');
-            const msg = "Olá, gostaria de confirmar a presença de " + c.nome + " e família.";
-            const linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(msg);
+            
+            // Lógica inteligente para mensagem de WhatsApp
+            var textoBase = "Olá, gostaria de confirmar sua presença";
+            if (c.maxConvidados > 1) {
+                textoBase += " e sua família";
+            }
+            textoBase += " no casamento da Patricia e Luiz Henrique";
+            
+            const linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(textoBase);
             
             let contatoUI = num.length >= 10 ? 
                 '<a href="' + linkWa + '" target="_blank" class="btn-wa">WhatsApp</a>' : 
@@ -258,7 +260,7 @@
     document.getElementById('btn-salvar').onclick = async function() {
         const n = document.getElementById('novo-nome').value;
         const t = document.getElementById('novo-contato').value;
-        const l = parseInt(document.getElementById('novo-limite').value); // Valor do select
+        const l = parseInt(document.getElementById('novo-limite').value);
         if(!n || !t) return alert("Preencha Nome e Contato");
         
         await addDoc(collection(db, "convidados"), { 
