@@ -6,17 +6,7 @@
     <title>Painel de Convidados - Patricia e Luiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --noivo: #34495e;
-            --noiva: #e74c3c;
-            --whatsapp: #25D366;
-            --sim: #27ae60;
-            --nao: #c0392b;
-            --pendente: #7f8c8d;
-            --bg: #f0f2f5;
-        }
-
+        :root { --primary: #2c3e50; --noivo: #34495e; --noiva: #e74c3c; --whatsapp: #27ae60; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         .admin-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
 
@@ -45,7 +35,6 @@
         .view-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .btn-voltar { background: #eee; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
         
-        /* Ferramentas */
         .tools-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .search-box { position: relative; }
         .search-box i { position: absolute; left: 10px; top: 12px; color: #999; }
@@ -55,29 +44,21 @@
         .add-form input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
         .btn-add { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* Lista Otimizada */
-        .guest-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 10px; }
-        .guest-info { flex: 1; min-width: 0; } /* min-width permite que o texto trunque se necessário */
-        .guest-name { font-weight: bold; font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .guest-contact-area { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
-        
-        .btn-wa { color: var(--whatsapp); text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
-        .resp-text { color: #888; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+        /* Lista Familiar */
+        .guest-row { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; gap: 10px; }
+        .guest-info { flex: 1; min-width: 0; }
+        .guest-name { font-weight: bold; font-size: 14px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .guest-details { display: flex; gap: 10px; align-items: center; margin-top: 5px; }
+        .limit-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #666; }
+        .btn-wa { color: var(--whatsapp); text-decoration: none; font-size: 12px; font-weight: bold; }
 
-        /* Botão Único de Status */
-        .btn-toggle-status { 
-            min-width: 85px; padding: 8px 5px; border-radius: 6px; border: none; 
-            color: white; font-size: 11px; font-weight: bold; cursor: pointer;
-            transition: background 0.2s; text-transform: uppercase;
+        /* Dropdown de Confirmação */
+        .select-confirm { 
+            padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; 
+            font-weight: bold; font-size: 13px; min-width: 100px;
         }
-        .status-sim { background: var(--sim); }
-        .status-nao { background: var(--nao); }
-        .status-pen { background: var(--pendente); }
-
-        @media (max-width: 380px) {
-            .btn-toggle-status { min-width: 70px; font-size: 10px; }
-            .guest-name { font-size: 13px; }
-        }
+        .select-sim { border-color: #27ae60; color: #27ae60; background: #eafaf1; }
+        .select-nao { border-color: #e74c3c; color: #e74c3c; background: #fdecea; }
     </style>
 </head>
 <body>
@@ -85,20 +66,20 @@
 <div class="admin-container">
     <div id="login-screen">
         <i class="fas fa-lock" style="font-size: 30px; color: var(--primary);"></i>
-        <h2>Acesso Painel</h2>
-        <input type="password" id="input-senha" placeholder="Senha (ex: 1306)">
+        <h2>Painel Noivos</h2>
+        <input type="password" id="input-senha" placeholder="Senha">
         <button id="btn-login">ACESSAR</button>
     </div>
 
     <div id="main-app" style="display:none;">
         <header>
-            <h1><i class="fas fa-heart"></i> Painel de Convidados</h1>
+            <h1><i class="fas fa-heart"></i> Controle por Família</h1>
         </header>
 
         <div id="view-dashboard">
             <div class="stats-bar">
-                <div class="stat-card"><span>Total</span><b id="total-geral">0</b></div>
-                <div class="stat-card"><span>Confirmados</span><b id="conf-geral">0</b></div>
+                <div class="stat-card"><span>Total Convidados</span><b id="total-geral">0</b></div>
+                <div class="stat-card"><span>Presenças Conf.</span><b id="conf-geral">0</b></div>
             </div>
             <div class="menu-grid">
                 <div class="menu-card card-luiz" id="menu-luiz"><i class="fas fa-user-tie"></i><h3>Luiz</h3></div>
@@ -115,12 +96,13 @@
             <div class="tools-bar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="input-busca" placeholder="Buscar convidado...">
+                    <input type="text" id="input-busca" placeholder="Buscar chefe da casa...">
                 </div>
                 <div class="add-form">
-                    <input type="text" id="novo-nome" placeholder="Nome">
-                    <input type="text" id="novo-contato" placeholder="Tel ou Responsável">
-                    <button class="btn-add" id="btn-salvar">Adicionar Convidado</button>
+                    <input type="text" id="novo-nome" placeholder="Nome do Chefe">
+                    <input type="text" id="novo-contato" placeholder="WhatsApp ou Resp.">
+                    <input type="number" id="novo-limite" placeholder="Qtd. total de pessoas" min="1" value="1">
+                    <button class="btn-add" id="btn-salvar">Adicionar Família</button>
                 </div>
             </div>
 
@@ -159,7 +141,7 @@
         ladoAtivo = lado;
         document.getElementById('view-dashboard').style.display = 'none';
         document.getElementById('view-lista').style.display = 'block';
-        document.getElementById('titulo-lista').innerText = "Convidados de " + lado;
+        document.getElementById('titulo-lista').innerText = "Lista de " + lado;
         carregarLista();
     }
 
@@ -183,65 +165,89 @@
 
     function renderizar() {
         const termo = document.getElementById('input-busca').value.toLowerCase();
-        const filtrados = baseDados.filter(c => (c.nome || "").toLowerCase().includes(termo) || (c.telefone || "").toLowerCase().includes(termo));
+        const filtrados = baseDados.filter(c => (c.nome || "").toLowerCase().includes(termo));
         
         const corpo = document.getElementById('lista-corpo');
         corpo.innerHTML = "";
         
         filtrados.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(c => {
             const num = (c.telefone || "").replace(/\D/g, '');
-            const msg = "Olá, gostaria de confirmar sua presença no casamento da Patricia e Luiz Henrique";
+            const msg = "Olá, gostaria de confirmar a presença de " + c.nome + " e família.";
             const linkWa = "https://wa.me/55" + num + "?text=" + encodeURIComponent(msg);
             
             let contatoUI = num.length >= 10 ? 
-                '<a href="' + linkWa + '" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>' : 
-                '<span class="resp-text">👤 ' + c.telefone + '</span>';
+                '<a href="' + linkWa + '" target="_blank" class="btn-wa">WhatsApp</a>' : 
+                '<span class="limit-badge">' + c.telefone + '</span>';
 
-            // Lógica do botão único
-            let btnClass = "status-pen";
-            let btnText = "Pendente";
-            if(c.confirmado === true) { btnClass = "status-sim"; btnText = "Confirmado"; }
-            else if(c.confirmado === false) { btnClass = "status-nao"; btnText = "Não vai"; }
+            // Monta o select dinâmico
+            let selectHTML = '<select class="select-confirm" id="sel-' + c.id + '">';
+            selectHTML += '<option value="0">Pendente</option>';
+            for(let i=1; i <= (c.maxConvidados || 1); i++) {
+                let selected = (c.confirmados == i) ? 'selected' : '';
+                selectHTML += '<option value="' + i + '" ' + selected + '>' + i + ' confirmados</option>';
+            }
+            selectHTML += '<option value="recusado" ' + (c.confirmados === "recusado" ? 'selected' : '') + '>Não irá</option>';
+            selectHTML += '</select>';
 
             const div = document.createElement('div');
             div.className = "guest-row";
-            div.innerHTML = `
-                <div class="guest-info">
-                    <span class="guest-name">${c.nome}</span>
-                    <div class="guest-contact-area">${contatoUI}</div>
-                </div>
-                <button class="btn-toggle-status ${btnClass}" id="btn-${c.id}">${btnText}</button>
-            `;
+            div.innerHTML = '<div class="guest-info">' +
+                '<span class="guest-name">' + c.nome + '</span>' +
+                '<div class="guest-details">' +
+                '<span class="limit-badge">Limite: ' + (c.maxConvidados || 1) + '</span>' +
+                contatoUI + '</div></div>' + selectHTML;
+
             corpo.appendChild(div);
-            document.getElementById("btn-" + c.id).onclick = () => alternarStatus(c.id, c.confirmado);
+            
+            const sel = document.getElementById('sel-' + c.id);
+            if(c.confirmados > 0) sel.classList.add('select-sim');
+            if(c.confirmados === 'recusado') sel.classList.add('select-nao');
+
+            sel.onchange = (e) => salvarQuantidade(c.id, e.target.value);
         });
     }
 
-    async function alternarStatus(id, atual) {
-        let novoStatus;
-        if(atual === null || atual === undefined) novoStatus = true; // De pendente para Sim
-        else if(atual === true) novoStatus = false; // De Sim para Não
-        else novoStatus = null; // De Não para Pendente (ciclo)
-
-        await updateDoc(doc(db, "convidados", id), { confirmado: novoStatus });
+    async function salvarQuantidade(id, valor) {
+        let confirmados = (valor === "recusado") ? "recusado" : parseInt(valor);
+        await updateDoc(doc(db, "convidados", id), { confirmados: confirmados });
         carregarLista();
     }
 
     document.getElementById('btn-salvar').onclick = async function() {
         const n = document.getElementById('novo-nome').value;
         const t = document.getElementById('novo-contato').value;
+        const l = parseInt(document.getElementById('novo-limite').value);
         if(!n || !t) return alert("Preencha Nome e Contato");
-        await addDoc(collection(db, "convidados"), { nome: n, telefone: t, lado: ladoAtivo, confirmado: null });
+        
+        await addDoc(collection(db, "convidados"), { 
+            nome: n, 
+            telefone: t, 
+            lado: ladoAtivo, 
+            maxConvidados: l, 
+            confirmados: 0 
+        });
+        
         document.getElementById('novo-nome').value = "";
         document.getElementById('novo-contato').value = "";
+        document.getElementById('novo-limite').value = 1;
         carregarLista();
     };
 
     async function atualizarResumo() {
         const snap = await getDocs(collection(db, "convidados"));
-        const todos = snap.docs.map(d => d.data());
-        document.getElementById('total-geral').innerText = todos.length;
-        document.getElementById('conf-geral').innerText = todos.filter(c => c.confirmado === true).length;
+        let totalPessoas = 0;
+        let confirmadosTotal = 0;
+        
+        snap.forEach(doc => {
+            const data = doc.data();
+            totalPessoas += (data.maxConvidados || 0);
+            if(data.confirmados && data.confirmados !== "recusado") {
+                confirmadosTotal += data.confirmados;
+            }
+        });
+        
+        document.getElementById('total-geral').innerText = totalPessoas;
+        document.getElementById('conf-geral').innerText = confirmadosTotal;
     }
 </script>
 </body>
