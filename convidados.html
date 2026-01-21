@@ -6,17 +6,7 @@
     <title>Painel de Convidados - Patricia e Luiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --noivo: #34495e;
-            --noiva: #e74c3c;
-            --whatsapp: #27ae60;
-            --sim: #27ae60;
-            --nao: #c0392b;
-            --pendente: #7f8c8d;
-            --bg: #f0f2f5;
-        }
-
+        :root { --primary: #2c3e50; --noivo: #34495e; --noiva: #e74c3c; --whatsapp: #27ae60; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         .admin-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; box-sizing: border-box; }
 
@@ -35,7 +25,7 @@
         .stat-card b { display: block; font-size: 18px; color: var(--primary); }
         .stat-card span { font-size: 10px; color: #666; text-transform: uppercase; }
 
-        /* Contadores Específicos (Acima da busca) */
+        /* Contadores Específicos */
         .stats-lado-mini { display: flex; gap: 8px; margin-bottom: 15px; }
         .card-mini { background: #f8f9fa; border: 1px solid #eee; flex: 1; padding: 10px; border-radius: 8px; text-align: center; }
         .card-mini b { display: block; font-size: 16px; color: var(--primary); }
@@ -57,7 +47,7 @@
         .search-box input { width: 100%; padding: 10px 10px 10px 32px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
         .add-form { background: #f9f9f9; padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
-        .add-form input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .add-form input, .add-form select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; }
         .btn-add { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
         /* Itens da Lista */
@@ -110,11 +100,11 @@
 
             <div class="stats-lado-mini">
                 <div class="card-mini">
-                    <span>Total Deste Lado</span>
+                    <span id="label-total-lado">Total</span>
                     <b id="mini-total-lado">0</b>
                 </div>
                 <div class="card-mini">
-                    <span>Confirmados Aqui</span>
+                    <span>Confirmados</span>
                     <b id="mini-conf-lado">0</b>
                 </div>
             </div>
@@ -127,7 +117,19 @@
                 <div class="add-form">
                     <input type="text" id="novo-nome" placeholder="Nome do Responsável">
                     <input type="text" id="novo-contato" placeholder="WhatsApp ou Resp.">
-                    <input type="number" id="novo-limite" placeholder="Limite de pessoas" min="1" value="1">
+                    
+                    <label style="font-size: 10px; color: #666; font-weight: bold;">LIMITE DE PESSOAS:</label>
+                    <select id="novo-limite">
+                        <option value="1">1 Pessoa</option><option value="2">2 Pessoas</option>
+                        <option value="3">3 Pessoas</option><option value="4">4 Pessoas</option>
+                        <option value="5">5 Pessoas</option><option value="6">6 Pessoas</option>
+                        <option value="7">7 Pessoas</option><option value="8">8 Pessoas</option>
+                        <option value="9">9 Pessoas</option><option value="10">10 Pessoas</option>
+                        <option value="11">11 Pessoas</option><option value="12">12 Pessoas</option>
+                        <option value="13">13 Pessoas</option><option value="14">14 Pessoas</option>
+                        <option value="15">15 Pessoas</option>
+                    </select>
+                    
                     <button class="btn-add" id="btn-salvar">Adicionar</button>
                 </div>
             </div>
@@ -168,6 +170,10 @@
         document.getElementById('view-dashboard').style.display = 'none';
         document.getElementById('view-lista').style.display = 'block';
         document.getElementById('titulo-lista').innerText = "Convidados de " + lado;
+        
+        // Altera a legenda conforme o lado
+        document.getElementById('label-total-lado').innerText = "Total de " + lado;
+        
         carregarLista();
     }
 
@@ -193,7 +199,6 @@
         const termo = document.getElementById('input-busca').value.toLowerCase();
         const filtrados = baseDados.filter(c => (c.nome || "").toLowerCase().includes(termo));
         
-        // CÁLCULO DOS CONTADORES DO LADO ATIVO
         let somaTotalLado = 0;
         let somaConfLado = 0;
         
@@ -253,7 +258,7 @@
     document.getElementById('btn-salvar').onclick = async function() {
         const n = document.getElementById('novo-nome').value;
         const t = document.getElementById('novo-contato').value;
-        const l = parseInt(document.getElementById('novo-limite').value);
+        const l = parseInt(document.getElementById('novo-limite').value); // Valor do select
         if(!n || !t) return alert("Preencha Nome e Contato");
         
         await addDoc(collection(db, "convidados"), { 
