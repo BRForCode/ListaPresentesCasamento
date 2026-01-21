@@ -53,7 +53,7 @@
     .item-header { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
     .item-header img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
 
-    /* Contadores Dinâmicos Convidados */
+    /* Dash Convidados */
     .mini-dash-convidados { display: flex; gap: 10px; margin-bottom: 15px; }
     .mini-card { flex: 1; background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
     .mini-card span { font-size: 10px; color: #666; font-weight: bold; text-transform: uppercase; }
@@ -70,12 +70,16 @@
     .input-edit { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; }
     .label-mini { font-size: 10px; color: #999; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; display: block; }
     
-    .guest-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .guest-actions { display: flex; gap: 5px; align-items: center; }
-    
+    /* Layout Edição Convidado */
+    .guest-edit-row { display: grid; grid-template-columns: 1fr 1fr 60px 90px; gap: 8px; align-items: flex-end; }
     .btn-del { background: var(--cor-vermelho); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; }
     .btn-save { background: var(--cor-azul); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .btn-upload { background: var(--cor-verde); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
+
+    @media (max-width: 600px) {
+        .guest-edit-row { grid-template-columns: 1fr; gap: 5px; }
+        .guest-actions-mobile { display: flex; gap: 5px; margin-top: 5px; }
+    }
   </style>
 </head>
 <body>
@@ -223,16 +227,25 @@
             if(typeof c.confirmados === 'number') confirmadosPessoas += c.confirmados;
 
             const card = document.createElement("div");
-            card.className = "item-admin guest-row";
+            card.className = "item-admin";
             card.innerHTML = `
-                <div style="flex-grow:1">
-                    <strong>${c.nome}</strong><br>
-                    <small>${c.telefone || "Sem tel"} | Lado: ${c.lado}</small>
-                </div>
-                <div class="guest-actions">
-                    <input type="number" id="max-${c.id}" value="${c.maxConvidados || 1}" class="input-edit" style="width:60px">
-                    <button class="btn-save" onclick="updateMax('${c.id}')"><i class="fas fa-sync"></i></button>
-                    <button class="btn-del" onclick="excluirConvidado('${c.id}')"><i class="fas fa-trash"></i></button>
+                <div class="guest-edit-row">
+                    <div>
+                        <label class="label-mini">Nome do Responsável</label>
+                        <input type="text" id="nome-${c.id}" value="${c.nome}" class="input-edit">
+                    </div>
+                    <div>
+                        <label class="label-mini">Telefone / Obs</label>
+                        <input type="text" id="tel-${c.id}" value="${c.telefone || ""}" class="input-edit">
+                    </div>
+                    <div>
+                        <label class="label-mini">Limite</label>
+                        <input type="number" id="max-${c.id}" value="${c.maxConvidados || 1}" class="input-edit">
+                    </div>
+                    <div class="guest-actions-mobile">
+                        <button class="btn-save" onclick="salvarConvidado('${c.id}')"><i class="fas fa-sync"></i> Salvar</button>
+                        <button class="btn-del" onclick="excluirConvidado('${c.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>`;
             div.appendChild(card);
         });
@@ -241,12 +254,19 @@
         document.getElementById('mini-conf').innerText = confirmadosPessoas;
     }
 
-    function updateMax(id) {
-        const val = parseInt(document.getElementById('max-'+id).value);
-        db.collection("convidados").doc(id).update({ maxConvidados: val }).then(() => alert("Limite atualizado!"));
+    function salvarConvidado(id) {
+        const novoNome = document.getElementById('nome-'+id).value;
+        const novoTel = document.getElementById('tel-'+id).value;
+        const novoMax = parseInt(document.getElementById('max-'+id).value);
+        
+        db.collection("convidados").doc(id).update({ 
+            nome: novoNome,
+            telefone: novoTel,
+            maxConvidados: novoMax 
+        }).then(() => alert("Dados atualizados com sucesso!"));
     }
 
-    function excluirConvidado(id) { if(confirm("Excluir grupo?")) db.collection("convidados").doc(id).delete(); }
+    function excluirConvidado(id) { if(confirm("Excluir grupo familiar?")) db.collection("convidados").doc(id).delete(); }
 
     function importarJson(event) {
         const file = event.target.files[0];
@@ -261,7 +281,7 @@
                         maxConvidados: parseInt(obj.maxConvidados || 1), confirmados: 0
                     });
                 });
-                alert("Importado!");
+                alert("Importação concluída!");
             } catch (err) { alert("Erro no JSON."); }
         };
         reader.readAsText(file);
@@ -305,7 +325,7 @@
         total: parseInt(document.getElementById("t-"+id).value),
         recebidos: parseInt(document.getElementById("r-"+id).value),
         imagem: document.getElementById("i-"+id).value
-      }).then(() => alert("Salvo!"));
+      }).then(() => alert("Presente atualizado!"));
     }
     function excluirP(id) { if(confirm("Excluir?")) db.collection("presentes").doc(id).delete(); }
 
@@ -325,7 +345,7 @@
         div.appendChild(card);
       });
     });
-    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Salva!")); }
+    function salvarM(id) { db.collection("mensagens").doc(id).update({ texto: document.getElementById("mt-"+id).value }).then(() => alert("Mensagem salva!")); }
     function excluirM(id) { if(confirm("Excluir?")) db.collection("mensagens").doc(id).delete(); }
     function carregarPix() { db.collection("config").doc("pix").get().then((doc) => { if (doc.exists) document.getElementById("inputChavePix").value = doc.data().chave; }); }
     function salvarPix() { db.collection("config").doc("pix").set({ chave: document.getElementById("inputChavePix").value }).then(() => alert("Pix salvo!")); }
