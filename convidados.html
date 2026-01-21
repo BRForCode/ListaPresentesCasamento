@@ -60,7 +60,7 @@
 
         .select-confirm { 
             padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; 
-            font-weight: bold; font-size: 13px; min-width: 100px;
+            font-weight: bold; font-size: 13px; min-width: 120px;
         }
         .select-sim { border-color: #27ae60; color: #27ae60; background: #eafaf1; }
         .select-nao { border-color: #e74c3c; color: #e74c3c; background: #fdecea; }
@@ -193,7 +193,6 @@
     function renderizar() {
         const termo = document.getElementById('input-busca').value.toLowerCase();
         
-        // BUSCA UNIFICADA: Verifica Nome ou Telefone
         const filtrados = baseDados.filter(c => {
             const bateNome = (c.nome || "").toLowerCase().includes(termo);
             const bateTelefone = (String(c.telefone) || "").toLowerCase().includes(termo);
@@ -234,11 +233,12 @@
                 contatoUI = '<span style="font-size: 10px; color: #ccc;">Sem contato</span>';
             }
 
+            // OPÇÕES COM LEGENDAS POR EXTENSO: "Confirmado X"
             let selectHTML = '<select class="select-confirm" id="sel-' + c.id + '">';
             selectHTML += '<option value="0">Pendente</option>';
             for(let i=1; i <= (c.maxConvidados || 1); i++) {
                 let selected = (c.confirmados == i) ? 'selected' : '';
-                selectHTML += '<option value="' + i + '" ' + selected + '>' + i + ' conf.</option>';
+                selectHTML += '<option value="' + i + '" ' + selected + '>Confirmado ' + i + '</option>';
             }
             selectHTML += '<option value="recusado" ' + (c.confirmados === "recusado" ? 'selected' : '') + '>Não irá</option>';
             selectHTML += '</select>';
